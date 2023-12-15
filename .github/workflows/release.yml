@@ -1,0 +1,29 @@
+
+name: Release
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.21'
+
+    - name: Setup Altipla tools
+      run: go install github.com/altipla-consulting/linter@latest
+
+    - name: Lint
+      run: make lint
+
+    - name: Test
+      run: make test
