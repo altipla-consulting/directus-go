@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -80,7 +81,10 @@ func (client *Client) do(req *http.Request, dest interface{}) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("directus: unexpected status code %v for url %q", resp.StatusCode, req.URL.String())
+		return &unexpectedStatusError{
+			status: resp.StatusCode,
+			url:    req.URL,
+		}
 	}
 
 	if dest != nil {
@@ -117,14 +121,15 @@ func WithFields(fields ...string) ReadOption {
 }
 
 func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, request, reply any) error {
-	var buf *bytes.Buffer
+	var body io.Reader
 	if request != nil {
-		buf = bytes.NewBuffer(nil)
-		if err := json.NewEncoder(buf).Encode(request); err != nil {
+		var buf bytes.Buffer
+		if err := json.NewEncoder(&buf).Encode(request); err != nil {
 			return fmt.Errorf("directus: cannot encode request: %v", err)
 		}
+		body = &buf
 	}
-	req, err := http.NewRequestWithContext(ctx, method, url, buf)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
@@ -149,6 +154,10 @@ func (items *ItemsClient[T]) Get(ctx context.Context, id string) (*T, error) {
 		Data *T `json:"data"`
 	}{}
 	if err := items.itemsdo(ctx, http.MethodGet, items.c.urlf("/items/%s/%s", items.collection, id), nil, &reply); err != nil {
+		var e *unexpectedStatusError
+		if errors.As(err, &e) && e.status == http.StatusForbidden {
+			return nil, fmt.Errorf("%w: %v", ErrItemNotFound, id)
+		}
 		return nil, err
 	}
 	return reply.Data, nil

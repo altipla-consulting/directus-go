@@ -79,6 +79,13 @@ func TestItemsGetFields(t *testing.T) {
 	fmt.Printf("%#v\n", regime)
 }
 
+func TestItemsGetNotFound(t *testing.T) {
+	items := NewItemsClient[Regime](initClient(t), "regimes")
+	regime, err := items.Get(context.Background(), "foo")
+	require.Nil(t, regime)
+	require.EqualError(t, err, "directus: item not found: foo")
+}
+
 func TestItemsCreate(t *testing.T) {
 	items := NewItemsClient[Regime](initClient(t), "regimes")
 	regime, err := items.Create(context.Background(), &Regime{
