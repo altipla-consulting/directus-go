@@ -48,6 +48,10 @@ func (client *Client) urlf(format string, a ...interface{}) string {
 	return fmt.Sprintf("%s%s", client.instance, fmt.Sprintf(format, a...))
 }
 
+func (client *Client) listurlf(format string) string {
+	return fmt.Sprintf("%s%s", client.instance, format)
+}
+
 func (client *Client) do(req *http.Request, dest interface{}) error {
 	client.logger.Debug("directus request", "method", req.Method, "url", req.URL.String())
 	if client.bodyLogger && req.Body != nil {
@@ -110,6 +114,16 @@ func NewItemsClient[T any](client *Client, collection string, opts ...ReadOption
 	}
 }
 
+type ListClient struct {
+	c *Client
+}
+
+func NewListClient(client *Client) *ListClient {
+	return &ListClient{
+		c: client,
+	}
+}
+
 type ReadOption func(req *http.Request)
 
 func WithFields(fields ...string) ReadOption {
@@ -139,6 +153,22 @@ func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, re
 	return items.c.do(req, &reply)
 }
 
+func (list *ListClient) listdo(ctx context.Context, method, url string, request, reply any) error {
+	var body io.Reader
+	if request != nil {
+		var buf bytes.Buffer
+		if err := json.NewEncoder(&buf).Encode(request); err != nil {
+			return fmt.Errorf("directus: cannot encode request: %v", err)
+		}
+		body = &buf
+	}
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		return fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	return list.c.do(req, &reply)
+}
+
 func (items *ItemsClient[T]) List(ctx context.Context) ([]*T, error) {
 	reply := struct {
 		Data []*T `json:"data"`
@@ -146,6 +176,22 @@ func (items *ItemsClient[T]) List(ctx context.Context) ([]*T, error) {
 	if err := items.itemsdo(ctx, http.MethodGet, items.c.urlf("/items/%s", items.collection), nil, &reply); err != nil {
 		return nil, err
 	}
+	return reply.Data, nil
+}
+
+type Role struct {
+	ID          string `json:"id,omitempty"`
+	AdminAccess bool   `json:"admin_access,omitempty"`
+}
+
+func (list *ListClient) ListRoles(ctx context.Context) ([]Role, error) {
+	reply := struct {
+		Data []Role `json:"data"`
+	}{}
+	if err := list.listdo(ctx, http.MethodGet, list.c.listurlf("/roles"), nil, &reply); err != nil {
+		return nil, err
+	}
+
 	return reply.Data, nil
 }
 
