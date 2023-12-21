@@ -39,10 +39,12 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 		token:    token,
 		logger:   slog.New(slog.Default().Handler()),
 	}
-	client.Roles = &clientRoles{c: client}
 	for _, opt := range opts {
 		opt(client)
 	}
+
+	client.Roles = &clientRoles{c: client}
+
 	return client
 }
 
