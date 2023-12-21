@@ -49,8 +49,7 @@ func TestItemsList(t *testing.T) {
 }
 
 func TestListRoles(t *testing.T) {
-	list := NewListClient(initClient(t))
-	roles, err := list.ListRoles(context.Background())
+	roles, err := initClient(t).ListRoles(context.Background())
 	require.NoError(t, err)
 	require.NotEmpty(t, roles)
 
