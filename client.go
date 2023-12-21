@@ -16,6 +16,7 @@ type Client struct {
 	instance, token string
 	logger          *slog.Logger
 	bodyLogger      bool
+	Roles           *clientRoles
 }
 
 type ClientOption func(client *Client)
@@ -38,6 +39,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 		token:    token,
 		logger:   slog.New(slog.Default().Handler()),
 	}
+	client.Roles = &clientRoles{c: client}
 	for _, opt := range opts {
 		opt(client)
 	}
@@ -165,22 +167,6 @@ func (items *ItemsClient[T]) List(ctx context.Context) ([]*T, error) {
 	return reply.Data, nil
 }
 
-type Role struct {
-	ID          string `json:"id,omitempty"`
-	AdminAccess bool   `json:"admin_access,omitempty"`
-}
-
-func (c *Client) ListRoles(ctx context.Context) ([]Role, error) {
-	reply := struct {
-		Data []Role `json:"data"`
-	}{}
-	if err := c.listdo(ctx, http.MethodGet, c.urlf("/roles"), nil, &reply); err != nil {
-		return nil, err
-	}
-
-	return reply.Data, nil
-}
-
 func (items *ItemsClient[T]) Get(ctx context.Context, id string) (*T, error) {
 	reply := struct {
 		Data *T `json:"data"`
@@ -246,5 +232,25 @@ func (s *SingletonClient[T]) Update(ctx context.Context, item *T) (*T, error) {
 	if err := s.items.itemsdo(ctx, http.MethodPatch, s.items.c.urlf("/items/%s", s.items.collection), item, &reply); err != nil {
 		return nil, err
 	}
+	return reply.Data, nil
+}
+
+type clientRoles struct {
+	c *Client
+}
+
+type Role struct {
+	ID          string `json:"id,omitempty"`
+	AdminAccess bool   `json:"admin_access,omitempty"`
+}
+
+func (cr clientRoles) List(ctx context.Context) ([]Role, error) {
+	reply := struct {
+		Data []Role `json:"data"`
+	}{}
+	if err := cr.c.listdo(ctx, http.MethodGet, cr.c.urlf("/roles"), nil, &reply); err != nil {
+		return nil, err
+	}
+
 	return reply.Data, nil
 }
