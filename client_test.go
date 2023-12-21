@@ -48,16 +48,6 @@ func TestItemsList(t *testing.T) {
 	}
 }
 
-func TestListRoles(t *testing.T) {
-	roles, err := initClient(t).Roles.List(context.Background())
-	require.NoError(t, err)
-	require.NotEmpty(t, roles)
-
-	for _, role := range roles {
-		fmt.Printf("%#v\n", role)
-	}
-}
-
 func TestItemsListFields(t *testing.T) {
 	items := NewItemsClient[Regime](initClient(t), "regimes", WithFields("id", "code"))
 	regimes, err := items.List(context.Background())
