@@ -12,6 +12,10 @@ type ProtoJSON[T proto.Message] struct {
 	Value T
 }
 
+func NewProtoJSON[T proto.Message](value T) ProtoJSON[T] {
+	return ProtoJSON[T]{Value: value}
+}
+
 func (n ProtoJSON[T]) String() string {
 	return prototext.Format(n.Value)
 }

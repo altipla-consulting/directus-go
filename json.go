@@ -10,6 +10,10 @@ type JSON[T any] struct {
 	Value T
 }
 
+func NewJSON[T any](value T) JSON[T] {
+	return JSON[T]{Value: value}
+}
+
 func (n JSON[T]) String() string {
 	return fmt.Sprintf("%v", n.Value)
 }
