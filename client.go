@@ -100,12 +100,10 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 		client.logger.Debug(string(body))
 	}
 
-	if req.Method != http.MethodDelete && resp.StatusCode != http.StatusNoContent {
-		if resp.StatusCode != http.StatusOK {
-			return &unexpectedStatusError{
-				status: resp.StatusCode,
-				url:    req.URL,
-			}
+	if resp.StatusCode != http.StatusOK && (req.Method != http.MethodDelete && resp.StatusCode != http.StatusNoContent) {
+		return &unexpectedStatusError{
+			status: resp.StatusCode,
+			url:    req.URL,
 		}
 	}
 
