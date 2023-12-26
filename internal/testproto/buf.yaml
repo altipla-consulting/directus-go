@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/altipla/directus-go
+lint:
+  use:
+  - DEFAULT
+breaking:
+  use:
+  - FILE

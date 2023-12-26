@@ -1,6 +1,8 @@
 package directus
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 
 	"google.golang.org/protobuf/encoding/protojson"
@@ -21,10 +23,21 @@ func (n ProtoJSON[T]) String() string {
 }
 
 func (n ProtoJSON[T]) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(n.Value)
+	content, err := protojson.Marshal(n.Value)
+	if err != nil {
+		return nil, fmt.Errorf("directus: cannot marshal protobuf json: %w", err)
+	}
+	return json.Marshal(string(content))
 }
 
 func (n *ProtoJSON[T]) UnmarshalJSON(data []byte) error {
+	var value string
+	if err := json.Unmarshal(data, &value); err != nil {
+		return fmt.Errorf("directus: cannot unmarshal protobuf json: %w", err)
+	}
 	n.Value = reflect.New(reflect.TypeOf(n.Value).Elem()).Interface().(T)
-	return protojson.Unmarshal(data, n.Value)
+	if value == "" {
+		return nil
+	}
+	return protojson.Unmarshal([]byte(value), n.Value)
 }

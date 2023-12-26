@@ -1,0 +1,8 @@
+
+syntax = "proto3";
+
+package directus_go.internal.testproto;
+
+message SimpleMessage {
+  string test_value = 1;
+}
