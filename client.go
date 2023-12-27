@@ -100,14 +100,14 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 		client.logger.Debug(string(body))
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && req.Method != http.MethodDelete && resp.StatusCode != http.StatusNoContent {
 		return &unexpectedStatusError{
 			status: resp.StatusCode,
 			url:    req.URL,
 		}
 	}
 
-	if dest != nil {
+	if dest != nil && len(body) > 0 {
 		if err := json.NewDecoder(bytes.NewReader(body)).Decode(dest); err != nil {
 			return fmt.Errorf("directus: cannot decode response: %v", err)
 		}
