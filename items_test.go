@@ -144,3 +144,19 @@ func TestItemsRelationValue(t *testing.T) {
 	fmt.Printf("%+v\n", regime)
 	fmt.Printf("%+v\n", regime.Translations[0].Value())
 }
+
+type PMSRoom struct {
+	ID          string `json:"id"`
+	Code        string `json:"code"`
+	DisplayName string `json:"display_name"`
+}
+
+func TestItemsFilter(t *testing.T) {
+	items := NewItemsClient[PMSRoom](initClient(t), "pms_rooms")
+	rooms, err := items.Filter(context.Background(), Gt("max_people", 3))
+	require.NoError(t, err)
+
+	for _, room := range rooms {
+		fmt.Printf("%#v\n", room)
+	}
+}

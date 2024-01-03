@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -59,6 +60,28 @@ func (items *ItemsClient[T]) List(ctx context.Context) ([]*T, error) {
 		Data []*T `json:"data"`
 	}{}
 	if err := items.itemsdo(ctx, http.MethodGet, items.c.urlf("/items/%s", items.collection), nil, &reply); err != nil {
+		return nil, err
+	}
+	return reply.Data, nil
+}
+
+func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter) ([]*T, error) {
+	u, err := url.Parse(items.c.urlf("/items/%s", items.collection))
+	if err != nil {
+		return nil, err
+	}
+	qs := u.Query()
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(filter.content()); err != nil {
+		return nil, fmt.Errorf("directus: cannot encode filter: %v", err)
+	}
+	qs.Set("filter", buf.String())
+	u.RawQuery = qs.Encode()
+
+	reply := struct {
+		Data []*T `json:"data"`
+	}{}
+	if err := items.itemsdo(ctx, http.MethodGet, u.String(), nil, &reply); err != nil {
 		return nil, err
 	}
 	return reply.Data, nil
