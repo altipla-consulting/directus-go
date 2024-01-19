@@ -1,6 +1,8 @@
 package directus
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -134,4 +136,12 @@ func (f filterEmpty) content() any {
 
 func Noop() Filter {
 	return filterEmpty{}
+}
+
+func FilterJSON(filter Filter) (string, error) {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(filter.content()); err != nil {
+		return "", fmt.Errorf("directus: cannot encode filter: %v", err)
+	}
+	return buf.String(), nil
 }

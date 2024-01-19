@@ -71,11 +71,11 @@ func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter) ([]*T, e
 		return nil, err
 	}
 	qs := u.Query()
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(filter.content()); err != nil {
-		return nil, fmt.Errorf("directus: cannot encode filter: %v", err)
+	f, err := FilterJSON(filter)
+	if err != nil {
+		return nil, err
 	}
-	qs.Set("filter", buf.String())
+	qs.Set("filter", f)
 	u.RawQuery = qs.Encode()
 
 	reply := struct {
