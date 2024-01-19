@@ -1,7 +1,13 @@
 package directus
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Filter interface {
 	content() any
+	String() string
 }
 
 type filterOperator struct {
@@ -16,6 +22,10 @@ func (f filterOperator) content() any {
 			f.op: f.value,
 		},
 	}
+}
+
+func (f filterOperator) String() string {
+	return fmt.Sprintf("%s %s %v", f.field, f.op, f.value)
 }
 
 func Eq(field string, value any) Filter {
@@ -69,6 +79,22 @@ func (f filterLogical) content() any {
 	}
 }
 
+func (f filterLogical) String() string {
+	vals := make([]string, len(f.values))
+	for i, v := range f.values {
+		vals[i] = v.String()
+	}
+	if f.op == "_and" {
+		return strings.Join(vals, " && ")
+	}
+	if f.op == "_or" {
+		return strings.Join(vals, " || ")
+	}
+
+	// Shouldn't reach here really.
+	return strings.Join(vals, " "+f.op+" ")
+}
+
 func And(filters ...Filter) Filter {
 	return filterLogical{op: "_and", values: filters}
 }
@@ -88,11 +114,19 @@ func (f filterRelated) content() any {
 	}
 }
 
+func (f filterRelated) String() string {
+	return fmt.Sprintf("%s.%s", f.field, f.filter.String())
+}
+
 func Related(field string, filter Filter) Filter {
 	return filterRelated{field, filter}
 }
 
 type filterEmpty struct{}
+
+func (f filterEmpty) String() string {
+	return ""
+}
 
 func (f filterEmpty) content() any {
 	return map[string]any{}
