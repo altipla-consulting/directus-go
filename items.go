@@ -88,6 +88,9 @@ func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter) ([]*T, e
 }
 
 func (items *ItemsClient[T]) Get(ctx context.Context, id string) (*T, error) {
+	if id == "" {
+		return nil, fmt.Errorf("%w: %v", ErrItemNotFound, id)
+	}
 	reply := struct {
 		Data *T `json:"data"`
 	}{}
