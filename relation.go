@@ -9,6 +9,7 @@ type Relation[T any] struct {
 	idstr string
 	idnum int64
 	value *T
+	Valid bool
 }
 
 func NewRelation[T any](data *T) Relation[T] {
@@ -54,6 +55,9 @@ func (r Relation[T]) MarshalJSON() ([]byte, error) {
 }
 
 func (r *Relation[T]) UnmarshalJSON(data []byte) error {
+	if r.value != nil {
+		r.Valid = true
+	}
 	if err := json.Unmarshal(data, &r.idstr); err == nil {
 		return nil
 	}
