@@ -49,11 +49,24 @@ func (r Relation[T]) String() string {
 	return "INVALID_RELATION"
 }
 
+func (r Relation[T]) Empty() bool {
+	return r.value == nil && r.idstr == "" && r.idnum == 0
+}
+
 func (r Relation[T]) MarshalJSON() ([]byte, error) {
+	if r.idstr != "" {
+		return json.Marshal(r.idstr)
+	}
+	if r.idnum != 0 {
+		return json.Marshal(r.idnum)
+	}
 	return json.Marshal(r.value)
 }
 
 func (r *Relation[T]) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		return nil
+	}
 	if err := json.Unmarshal(data, &r.idstr); err == nil {
 		return nil
 	}
