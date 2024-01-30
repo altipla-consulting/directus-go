@@ -76,8 +76,12 @@ type filterLogical struct {
 }
 
 func (f filterLogical) content() any {
+	var values []any
+	for _, v := range f.values {
+		values = append(values, v.content())
+	}
 	return map[string]any{
-		f.op: f.values,
+		f.op: values,
 	}
 }
 
