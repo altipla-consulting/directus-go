@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	// ErrItemNotFound is returned when the item is not found in the collection.
 	ErrItemNotFound = errors.New("directus: item not found")
 )
 

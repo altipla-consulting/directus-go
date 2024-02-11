@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Client keeps a connection to a Directus instance.
 type Client struct {
 	Roles *clientRoles
 
@@ -19,20 +20,24 @@ type Client struct {
 	bodyLogger      bool
 }
 
+// ClinetOption configures a client when creating it.
 type ClientOption func(client *Client)
 
+// WithLogger sets a custom logger for the sent requests and responses received from the server.
 func WithLogger(logger *slog.Logger) ClientOption {
 	return func(client *Client) {
 		client.logger = logger
 	}
 }
 
+// WithBodyLogger prints the request and response bodies to the logger.
 func WithBodyLogger() ClientOption {
 	return func(client *Client) {
 		client.bodyLogger = true
 	}
 }
 
+// NewClient creates a new connection to the Directus instance using the static token to authenticate.
 func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client := &Client{
 		instance: strings.TrimRight(instance, "/"),
