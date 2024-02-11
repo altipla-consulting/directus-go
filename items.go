@@ -18,14 +18,6 @@ type ItemsClient[T any] struct {
 	opts       []ReadOption
 }
 
-func NewItemsClient[T any](client *Client, collection string, opts ...ReadOption) *ItemsClient[T] {
-	return &ItemsClient[T]{
-		c:          client,
-		collection: collection,
-		opts:       opts,
-	}
-}
-
 type ReadOption func(req *http.Request)
 
 func WithFields(fields ...string) ReadOption {
@@ -36,7 +28,17 @@ func WithFields(fields ...string) ReadOption {
 	}
 }
 
-func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, request, reply any) error {
+func NewItemsClient[T any](client *Client, collection string, opts ...ReadOption) *ItemsClient[T] {
+	return &ItemsClient[T]{
+		c:          client,
+		collection: collection,
+		opts:       opts,
+	}
+}
+
+type doOption func(req *http.Request)
+
+func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, request, reply any, opts ...doOption) error {
 	var body io.Reader
 	if request != nil {
 		var buf bytes.Buffer
@@ -52,14 +54,42 @@ func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, re
 	for _, opt := range items.opts {
 		opt(req)
 	}
+	for _, opt := range opts {
+		opt(req)
+	}
 	return items.c.sendRequest(req, &reply)
 }
 
-func (items *ItemsClient[T]) List(ctx context.Context) ([]*T, error) {
+type ListOption func(req *http.Request)
+
+func WithSort(sort string) ListOption {
+	return func(req *http.Request) {
+		q := req.URL.Query()
+		if s := q.Get("sort"); s != "" {
+			q.Set("sort", strings.Join([]string{s, sort}, ","))
+		} else {
+			q.Add("sort", sort)
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+}
+
+func (items *ItemsClient[T]) List(ctx context.Context, opts ...ListOption) ([]*T, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, items.c.urlf("/items/%s", items.collection), nil)
+	if err != nil {
+		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	for _, opt := range items.opts {
+		opt(req)
+	}
+	for _, opt := range opts {
+		opt(req)
+	}
+
 	reply := struct {
 		Data []*T `json:"data"`
 	}{}
-	if err := items.itemsdo(ctx, http.MethodGet, items.c.urlf("/items/%s", items.collection), nil, &reply); err != nil {
+	if err := items.c.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
 	return reply.Data, nil
