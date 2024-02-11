@@ -65,11 +65,7 @@ type ListOption func(req *http.Request)
 func WithSort(sort string) ListOption {
 	return func(req *http.Request) {
 		q := req.URL.Query()
-		if s := q.Get("sort"); s != "" {
-			q.Set("sort", strings.Join([]string{s, sort}, ","))
-		} else {
-			q.Add("sort", sort)
-		}
+		q.Add("sort[]", sort)
 		req.URL.RawQuery = q.Encode()
 	}
 }
