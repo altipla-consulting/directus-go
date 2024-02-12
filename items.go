@@ -78,7 +78,7 @@ func WithDeepSort(field string, sort ...string) ReadOption {
 	return func(req *http.Request) {
 		q := req.URL.Query()
 		for _, s := range sort {
-			q.Add("deep[%s][_sort][]", s)
+			q.Add(fmt.Sprintf("deep[%s][_sort][]", field), s)
 		}
 		req.URL.RawQuery = q.Encode()
 	}
