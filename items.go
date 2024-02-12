@@ -88,7 +88,7 @@ func WithDeepSort(field string, sort ...string) ReadOption {
 func WithDeepLimit(field string, limit int64) ReadOption {
 	return func(req *http.Request) {
 		q := req.URL.Query()
-		q.Add("deep[%s][_limit]", fmt.Sprintf("%d", limit))
+		q.Add(fmt.Sprintf("deep[%s][_limit]", field), fmt.Sprintf("%d", limit))
 		req.URL.RawQuery = q.Encode()
 	}
 }
