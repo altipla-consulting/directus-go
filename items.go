@@ -149,7 +149,7 @@ func (items *ItemsClient[T]) List(ctx context.Context, opts ...ReadOption) ([]*T
 }
 
 // Filter items of the collection.
-func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter) ([]*T, error) {
+func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter, opts ...ReadOption) ([]*T, error) {
 	u, err := url.Parse(items.c.urlf("/items/%s", items.collection))
 	if err != nil {
 		return nil, err
@@ -162,10 +162,21 @@ func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter) ([]*T, e
 	qs.Set("filter", f)
 	u.RawQuery = qs.Encode()
 
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	for _, opt := range items.opts {
+		opt(req)
+	}
+	for _, opt := range opts {
+		opt(req)
+	}
+
 	reply := struct {
 		Data []*T `json:"data"`
 	}{}
-	if err := items.itemsdo(ctx, http.MethodGet, u.String(), nil, &reply); err != nil {
+	if err := items.c.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
 	return reply.Data, nil
