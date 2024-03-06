@@ -13,7 +13,8 @@ import (
 
 // Client keeps a connection to a Directus instance.
 type Client struct {
-	Roles *clientRoles
+	Roles  *clientRoles
+	Fields *clientFields
 
 	instance, token string
 	logger          *slog.Logger
@@ -49,6 +50,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	}
 
 	client.Roles = &clientRoles{c: client}
+	client.Fields = &clientFields{c: client}
 
 	return client
 }
