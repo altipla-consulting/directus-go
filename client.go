@@ -15,6 +15,7 @@ import (
 type Client struct {
 	Roles  *clientRoles
 	Fields *clientFields
+	Users  *clientUsers
 
 	instance, token string
 	logger          *slog.Logger
@@ -51,6 +52,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 
 	client.Roles = &clientRoles{c: client}
 	client.Fields = &clientFields{c: client}
+	client.Users = &clientUsers{c: client}
 
 	return client
 }
