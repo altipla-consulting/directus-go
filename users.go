@@ -10,11 +10,11 @@ type clientUsers struct {
 }
 
 type User struct {
-	ID        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
+	ID        string `json:"id,omitempty"`
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Role      string `json:"role,omitempty"`
 }
 
 func (cr clientUsers) List(ctx context.Context) ([]User, error) {
@@ -24,6 +24,13 @@ func (cr clientUsers) List(ctx context.Context) ([]User, error) {
 	if err := cr.c.buildSendRequest(ctx, http.MethodGet, cr.c.urlf("/users"), nil, &reply); err != nil {
 		return nil, err
 	}
-
 	return reply.Data, nil
+}
+
+func (cr clientUsers) Create(ctx context.Context, user *User) (*User, error) {
+	var reply User
+	if err := cr.c.buildSendRequest(ctx, http.MethodPost, cr.c.urlf("/users"), user, &reply); err != nil {
+		return nil, err
+	}
+	return &reply, nil
 }

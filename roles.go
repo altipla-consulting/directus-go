@@ -23,6 +23,5 @@ func (cr clientRoles) List(ctx context.Context) ([]Role, error) {
 	if err := cr.c.buildSendRequest(ctx, http.MethodGet, cr.c.urlf("/roles"), nil, &reply); err != nil {
 		return nil, err
 	}
-
 	return reply.Data, nil
 }

@@ -43,7 +43,6 @@ func (cr clientFields) List(ctx context.Context) ([]Field, error) {
 	if err := cr.c.buildSendRequest(ctx, http.MethodGet, cr.c.urlf("/fields"), nil, &reply); err != nil {
 		return nil, err
 	}
-
 	return reply.Data, nil
 }
 
@@ -54,6 +53,5 @@ func (cr clientFields) ListCollection(ctx context.Context, collection string) ([
 	if err := cr.c.buildSendRequest(ctx, http.MethodGet, cr.c.urlf("/fields/%s", collection), nil, &reply); err != nil {
 		return nil, err
 	}
-
 	return reply.Data, nil
 }
