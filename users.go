@@ -17,9 +17,9 @@ type User struct {
 	Role      string `json:"role,omitempty"`
 }
 
-func (cr clientUsers) List(ctx context.Context) ([]User, error) {
+func (cr clientUsers) List(ctx context.Context) ([]*User, error) {
 	reply := struct {
-		Data []User `json:"data"`
+		Data []*User `json:"data"`
 	}{}
 	if err := cr.c.buildSendRequest(ctx, http.MethodGet, cr.c.urlf("/users"), nil, &reply); err != nil {
 		return nil, err
