@@ -27,7 +27,7 @@ type Error struct {
 
 func (e Error) Error() string {
 	if e.Extensions.Code != "" {
-		return fmt.Sprintf("directus: %s (code = %s)", e.Message, e.Extensions.Code)
+		return fmt.Sprintf("directus: %s (code: %s)", e.Message, e.Extensions.Code)
 	}
 	return fmt.Sprintf("directus: %s", e.Message)
 }
