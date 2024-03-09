@@ -217,6 +217,9 @@ func (items *ItemsClient[T]) Update(ctx context.Context, id string, item *T) (*T
 		Data *T `json:"data"`
 	}{}
 	if err := items.itemsdo(ctx, http.MethodPatch, items.c.urlf("/items/%s/%s", items.collection, id), item, &reply); err != nil {
+		if errors.Is(err, ErrItemNotFound) {
+			return nil, fmt.Errorf("%w: %v", err, id)
+		}
 		return nil, err
 	}
 	return reply.Data, nil
