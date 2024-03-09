@@ -109,7 +109,20 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 		client.logger.Debug(string(body))
 	}
 
-	if resp.StatusCode != http.StatusOK && req.Method != http.MethodDelete && resp.StatusCode != http.StatusNoContent {
+	switch {
+	case resp.StatusCode == http.StatusOK:
+		// Everything is fine.
+
+	case req.Method == http.MethodDelete && resp.StatusCode == http.StatusNoContent:
+		// Everything is fine.
+
+	case resp.StatusCode == http.StatusBadRequest:
+		var reply errorsReply
+		if err := json.Unmarshal(body, &reply); err == nil && len(reply.Errors) > 0 {
+			return reply.Errors[0]
+		}
+
+	default:
 		return &unexpectedStatusError{
 			status: resp.StatusCode,
 			url:    req.URL,
@@ -117,10 +130,14 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 	}
 
 	if dest != nil && len(body) > 0 {
-		if err := json.NewDecoder(bytes.NewReader(body)).Decode(dest); err != nil {
+		if err := json.Unmarshal(body, dest); err != nil {
 			return fmt.Errorf("directus: cannot decode response: %v", err)
 		}
 	}
 
 	return nil
+}
+
+type errorsReply struct {
+	Errors []Error `json:"errors"`
 }
