@@ -39,5 +39,6 @@ type ErrorExtensions struct {
 type ErrorCode string
 
 const (
-	ErrorCodeRecordNotUnique = "RECORD_NOT_UNIQUE"
+	ErrorCodeRecordNotUnique   = "RECORD_NOT_UNIQUE"
+	ErrorCodeInvalidForeignKey = "INVALID_FOREIGN_KEY"
 )
