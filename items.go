@@ -132,6 +132,7 @@ func (items *ItemsClient[T]) List(ctx context.Context, opts ...ReadOption) ([]*T
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
+	WithNoLimit()(req)
 	for _, opt := range items.opts {
 		opt(req)
 	}
