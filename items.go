@@ -136,13 +136,9 @@ func (items *ItemsClient[T]) List(ctx context.Context, opts ...ReadOption) ([]*T
 	for _, opt := range items.opts {
 		opt(req)
 	}
-
-	if len(opts) == 0 {
-		WithNoLimit()(req)
-	} else {
-		for _, opt := range opts {
-			opt(req)
-		}
+	opts = append(opts, WithNoLimit())
+	for _, opt := range opts {
+		opt(req)
 	}
 
 	reply := struct {
