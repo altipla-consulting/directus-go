@@ -1,10 +1,15 @@
 package directus
 
 type Role struct {
-	ID          string `json:"id"`
+	ID          string `json:"id,omitempty"`
+	Icon        Icon   `json:"icon,omitempty"`
 	Name        string `json:"name"`
-	Description string `json:"description"`
-	AdminAccess bool   `json:"admin_access"`
+	Description string `json:"description,omitempty"`
+
+	AdminAccess bool `json:"admin_access"`
+	AppAccess   bool `json:"app_access"`
+
+	Users []string `json:"users,omitempty"`
 }
 
 type User struct {
@@ -13,4 +18,9 @@ type User struct {
 	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Role      string `json:"role,omitempty"`
+
+	Provider           string `json:"provider,omitempty"`
+	ExternalIdentifier string `json:"external_identifier,omitempty"`
 }
+
+type Icon string
