@@ -2,7 +2,6 @@ package directus
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,9 +12,10 @@ import (
 
 // Client keeps a connection to a Directus instance.
 type Client struct {
-	Roles  *clientRoles
+	Roles *ResourceClient[Role]
+	Users *ResourceClient[User]
+
 	Fields *clientFields
-	Users  *clientUsers
 
 	instance, token string
 	logger          *slog.Logger
@@ -50,31 +50,16 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 		opt(client)
 	}
 
-	client.Roles = &clientRoles{c: client}
-	client.Fields = &clientFields{c: client}
-	client.Users = &clientUsers{c: client}
+	client.Roles = NewResourceClient[Role](client, "roles")
+	client.Users = NewResourceClient[User](client, "users")
+
+	client.Fields = &clientFields{client: client}
 
 	return client
 }
 
 func (client *Client) urlf(format string, a ...interface{}) string {
 	return fmt.Sprintf("%s%s", client.instance, fmt.Sprintf(format, a...))
-}
-
-func (client *Client) buildSendRequest(ctx context.Context, method, url string, request, reply any) error {
-	var body io.Reader
-	if request != nil {
-		var buf bytes.Buffer
-		if err := json.NewEncoder(&buf).Encode(request); err != nil {
-			return fmt.Errorf("directus: cannot encode request: %v", err)
-		}
-		body = &buf
-	}
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
-	if err != nil {
-		return fmt.Errorf("directus: cannot prepare request: %v", err)
-	}
-	return client.sendRequest(req, &reply)
 }
 
 func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
