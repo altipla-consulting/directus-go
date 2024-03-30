@@ -12,8 +12,11 @@ import (
 
 // Client keeps a connection to a Directus instance.
 type Client struct {
-	Roles *ResourceClient[Role]
-	Users *ResourceClient[User]
+	Collections        *ResourceClient[Collection]
+	CustomTranslations *ResourceClient[CustomTranslation]
+	Folders            *ResourceClient[Folder]
+	Roles              *ResourceClient[Role]
+	Users              *ResourceClient[User]
 
 	Fields *clientFields
 
@@ -50,6 +53,9 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 		opt(client)
 	}
 
+	client.Collections = NewResourceClient[Collection](client, "collections")
+	client.CustomTranslations = NewResourceClient[CustomTranslation](client, "custom_translations")
+	client.Folders = NewResourceClient[Folder](client, "folders")
 	client.Roles = NewResourceClient[Role](client, "roles")
 	client.Users = NewResourceClient[User](client, "users")
 

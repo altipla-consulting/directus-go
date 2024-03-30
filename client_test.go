@@ -12,5 +12,5 @@ func initClient(t *testing.T) *Client {
 	if os.Getenv("DIRECTUS_TOKEN") == "" {
 		t.Skip("DIRECTUS_TOKEN not set")
 	}
-	return NewClient("https://compostela.admin.onetbooking.com", os.Getenv("DIRECTUS_TOKEN"), WithLogger(slog.New(handler)), WithBodyLogger())
+	return NewClient("http://localhost:8055", os.Getenv("DIRECTUS_TOKEN"), WithLogger(slog.New(handler)), WithBodyLogger())
 }
