@@ -198,6 +198,15 @@ const (
 	RelationActionNoAction RelationAction = "NO ACTION"
 )
 
+func (action *RelationAction) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*action = RelationAction(str)
+	return nil
+}
+
 type RelationMeta struct {
 	ID int64 `json:"id"`
 
