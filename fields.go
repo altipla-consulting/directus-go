@@ -71,6 +71,7 @@ const (
 	FieldSpecialAlias       FieldSpecial = "alias"
 	FieldSpecialNoData      FieldSpecial = "no-data"
 	FieldSpecialCastBoolean FieldSpecial = "cast-boolean"
+	FieldSpecialGroup       FieldSpecial = "group"
 )
 
 func (special *FieldSpecial) UnmarshalJSON(data []byte) error {
