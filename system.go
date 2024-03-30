@@ -35,6 +35,7 @@ type Collection struct {
 	Collection string            `json:"collection"`
 	Meta       CollectionMeta    `json:"meta"`
 	Schema     *CollectionSchema `json:"schema,omitempty"`
+	Fields     []*Field          `json:"fields,omitempty"`
 }
 
 type CollectionMeta struct {
