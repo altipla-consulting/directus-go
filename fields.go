@@ -73,6 +73,15 @@ const (
 	FieldSpecialCastBoolean FieldSpecial = "cast-boolean"
 )
 
+func (special *FieldSpecial) UnmarshalJSON(data []byte) error {
+	var value string
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*special = FieldSpecial(value)
+	return nil
+}
+
 type FieldSchema struct {
 	Name      string `json:"name,omitempty"`
 	Table     string `json:"table,omitempty"`
