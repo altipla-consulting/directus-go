@@ -54,7 +54,7 @@ type CollectionMeta struct {
 
 	Versioning bool `json:"versioning,omitempty"`
 
-	Accountability Accountability `json:"accountability,omitempty"`
+	Accountability *Accountability `json:"accountability"`
 
 	System bool `json:"system,omitempty"`
 
