@@ -55,7 +55,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	}
 
 	client.Collections = NewResourceClient[Collection](client, "collections")
-	client.CustomTranslations = NewResourceClient[CustomTranslation](client, "custom_translations")
+	client.CustomTranslations = NewResourceClient[CustomTranslation](client, "translations")
 	client.Folders = NewResourceClient[Folder](client, "folders")
 	client.Relations = NewResourceClient[RelationDefinition](client, "relations")
 	client.Roles = NewResourceClient[Role](client, "roles")
