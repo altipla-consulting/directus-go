@@ -15,6 +15,7 @@ type Client struct {
 	Collections        *ResourceClient[Collection]
 	CustomTranslations *ResourceClient[CustomTranslation]
 	Folders            *ResourceClient[Folder]
+	Relations          *ResourceClient[RelationDefinition]
 	Roles              *ResourceClient[Role]
 	Users              *ResourceClient[User]
 
@@ -56,6 +57,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Collections = NewResourceClient[Collection](client, "collections")
 	client.CustomTranslations = NewResourceClient[CustomTranslation](client, "custom_translations")
 	client.Folders = NewResourceClient[Folder](client, "folders")
+	client.Relations = NewResourceClient[RelationDefinition](client, "relations")
 	client.Roles = NewResourceClient[Role](client, "roles")
 	client.Users = NewResourceClient[User](client, "users")
 
