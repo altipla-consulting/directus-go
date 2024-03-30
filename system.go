@@ -40,6 +40,7 @@ type Collection struct {
 type CollectionMeta struct {
 	Collection string `json:"collection,omitempty"`
 
+	Color     string `json:"color,omitempty"`
 	Icon      Icon   `json:"icon,omitempty"`
 	Note      string `json:"note,omitempty"`
 	Hidden    bool   `json:"hidden"`
@@ -61,6 +62,10 @@ type CollectionMeta struct {
 	Accountability Nullable[Accountability] `json:"accountability"`
 
 	System bool `json:"system,omitempty"`
+
+	PreviewURL string `json:"preview_url,omitempty"`
+
+	DisplayTemplate string `json:"display_template,omitempty"`
 
 	Unknown map[string]any `json:"-"`
 }
