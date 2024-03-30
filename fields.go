@@ -151,11 +151,15 @@ func (cr *clientFields) Get(ctx context.Context, collection, field string) (*Fie
 }
 
 func (cr *clientFields) Create(ctx context.Context, field *Field) (*Field, error) {
+	if field.Collection == "" {
+		return nil, fmt.Errorf("directus: field collection is required")
+	}
+
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(field); err != nil {
 		return nil, fmt.Errorf("directus: cannot encode request: %v", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cr.client.urlf("/fields"), &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cr.client.urlf("/fields/%s", field.Collection), &buf)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
@@ -174,12 +178,19 @@ func (cr *clientFields) Delete(ctx context.Context, collection, field string) er
 	return cr.client.sendRequest(req, nil)
 }
 
-func (cr *clientFields) Patch(ctx context.Context, collection, field string, f *Field) (*Field, error) {
+func (cr *clientFields) Patch(ctx context.Context, f *Field) (*Field, error) {
+	if f.Collection == "" {
+		return nil, fmt.Errorf("directus: field collection is required")
+	}
+	if f.Field == "" {
+		return nil, fmt.Errorf("directus: field name is required")
+	}
+
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(f); err != nil {
 		return nil, fmt.Errorf("directus: cannot encode request: %v", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, cr.client.urlf("/fields/%s/%s", collection, field), &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, cr.client.urlf("/fields/%s/%s", f.Collection, f.Field), &buf)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
