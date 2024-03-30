@@ -200,6 +200,8 @@ const (
 type RelationMeta struct {
 	ID int64 `json:"id"`
 
+	System bool `json:"system,omitempty"`
+
 	Unknown map[string]any `json:"-"`
 }
 
