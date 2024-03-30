@@ -2,6 +2,7 @@ package directus
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -13,7 +14,9 @@ func TestResourcesCollectionsList(t *testing.T) {
 	collections, err := client.Collections.List(context.Background())
 	require.NoError(t, err)
 
-	for _, c := range collections {
-		fmt.Printf("%#v\n", c.Schema)
-	}
+	fmt.Printf("%#v\n", collections[0].Schema)
+
+	e, err := json.Marshal(collections[0])
+	require.NoError(t, err)
+	fmt.Println(string(e))
 }

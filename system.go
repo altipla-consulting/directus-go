@@ -1,6 +1,10 @@
 package directus
 
-import "github.com/perimeterx/marshmallow"
+import (
+	"encoding/json"
+
+	"github.com/perimeterx/marshmallow"
+)
 
 type Role struct {
 	ID          string `json:"id,omitempty"`
@@ -70,6 +74,22 @@ func (meta *CollectionMeta) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (meta *CollectionMeta) MarshalJSON() ([]byte, error) {
+	type alias CollectionMeta
+	base, err := json.Marshal((*alias)(meta))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range meta.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
 type CollectionCollapse string
 
 const (
@@ -96,6 +116,22 @@ func (schema *CollectionSchema) UnmarshalJSON(data []byte) error {
 	}
 	schema.Unknown = values
 	return nil
+}
+
+func (schema *CollectionSchema) MarshalJSON() ([]byte, error) {
+	type alias CollectionSchema
+	base, err := json.Marshal((*alias)(schema))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range schema.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
 }
 
 type Accountability string
@@ -132,6 +168,22 @@ func (schema *RelationSchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (schema *RelationSchema) MarshalJSON() ([]byte, error) {
+	type alias RelationSchema
+	base, err := json.Marshal((*alias)(schema))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range schema.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
 type RelationAction string
 
 const (
@@ -153,6 +205,22 @@ func (meta *RelationMeta) UnmarshalJSON(data []byte) error {
 	}
 	meta.Unknown = values
 	return nil
+}
+
+func (meta *RelationMeta) MarshalJSON() ([]byte, error) {
+	type alias RelationMeta
+	base, err := json.Marshal((*alias)(meta))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range meta.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
 }
 
 type CustomTranslation struct {
