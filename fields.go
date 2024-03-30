@@ -28,7 +28,7 @@ const (
 )
 
 type FieldMeta struct {
-	ID     int64      `json:"id"`
+	ID     int64      `json:"id,omitempty"`
 	Hidden bool       `json:"hidden"`
 	Width  FieldWidth `json:"width,omitempty"`
 

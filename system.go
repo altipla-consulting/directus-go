@@ -208,7 +208,7 @@ func (action *RelationAction) UnmarshalJSON(data []byte) error {
 }
 
 type RelationMeta struct {
-	ID int64 `json:"id"`
+	ID int64 `json:"id,omitempty"`
 
 	System bool `json:"system,omitempty"`
 
