@@ -53,7 +53,7 @@ type CollectionMeta struct {
 
 	SortField string `json:"sort_field,omitempty"`
 
-	Group    string             `json:"group,omitempty"`
+	Group    Nullable[string]   `json:"group,omitempty"`
 	Sort     int64              `json:"sort,omitempty"`
 	Collapse CollectionCollapse `json:"collapse,omitempty"`
 
