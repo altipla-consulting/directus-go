@@ -51,6 +51,15 @@ func (meta *FieldMeta) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (meta *FieldMeta) HasSpecial(special FieldSpecial) bool {
+	for _, s := range meta.Special {
+		if s == special {
+			return true
+		}
+	}
+	return false
+}
+
 type FieldWidth string
 
 const (
@@ -89,7 +98,7 @@ type FieldSchema struct {
 	DataType  string `json:"data_type"`
 	MaxLength int64  `json:"max_length,omitempty"`
 
-	IsNullable       bool `json:"is_nullable,omitempty"`
+	IsNullable       bool `json:"is_nullable"`
 	IsUnique         bool `json:"is_unique,omitempty"`
 	IsPrimaryKey     bool `json:"is_primary_key,omitempty"`
 	HasAutoIncrement bool `json:"has_auto_increment,omitempty"`
