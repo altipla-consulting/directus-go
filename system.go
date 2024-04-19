@@ -244,7 +244,7 @@ type CustomTranslation struct {
 	ID          string `json:"id,omitempty"`
 	Key         string `json:"key"`
 	Language    string `json:"language"`
-	Translation string `json:"translation"`
+	Translation string `json:"value"`
 }
 
 type Folder struct {
