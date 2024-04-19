@@ -242,8 +242,8 @@ func (meta *RelationMeta) MarshalJSON() ([]byte, error) {
 
 type CustomTranslation struct {
 	ID       string `json:"id,omitempty"`
-	Key      string `json:"key"`
-	Language string `json:"language"`
+	Key      string `json:"key,omitempty"`
+	Language string `json:"language,omitempty"`
 	Value    string `json:"value"`
 }
 
