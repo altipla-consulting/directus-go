@@ -241,10 +241,10 @@ func (meta *RelationMeta) MarshalJSON() ([]byte, error) {
 }
 
 type CustomTranslation struct {
-	ID          string `json:"id,omitempty"`
-	Key         string `json:"key"`
-	Language    string `json:"language"`
-	Translation string `json:"value"`
+	ID       string `json:"id,omitempty"`
+	Key      string `json:"key"`
+	Language string `json:"language"`
+	Value    string `json:"value"`
 }
 
 type Folder struct {
