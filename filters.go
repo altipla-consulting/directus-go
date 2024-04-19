@@ -70,6 +70,10 @@ func Between(field string, from, to any) Filter {
 	return filterOperator{field: field, op: "_between", value: []any{from, to}}
 }
 
+func StartsWith(field string, value string) Filter {
+	return filterOperator{field: field, op: "_starts_with", value: value}
+}
+
 type filterLogical struct {
 	op     string
 	values []Filter
