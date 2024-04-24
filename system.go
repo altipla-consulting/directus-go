@@ -248,7 +248,7 @@ type CustomTranslation struct {
 }
 
 type Folder struct {
-	ID     string `json:"id,omitempty"`
-	Name   string `json:"name"`
-	Parent string `json:"parent"`
+	ID     string           `json:"id,omitempty"`
+	Name   string           `json:"name"`
+	Parent Nullable[string] `json:"parent"`
 }
