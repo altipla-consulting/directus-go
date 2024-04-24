@@ -250,5 +250,5 @@ type CustomTranslation struct {
 type Folder struct {
 	ID     string `json:"id,omitempty"`
 	Name   string `json:"name"`
-	Parent string `json:"parent"`
+	Parent string `json:"parent,omitempty"`
 }
