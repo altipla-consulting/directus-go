@@ -252,3 +252,40 @@ type Folder struct {
 	Name   string           `json:"name"`
 	Parent Nullable[string] `json:"parent"`
 }
+
+type Preset struct {
+	ID         int64            `json:"id,omitempty"`
+	Bookmark   Nullable[string] `json:"bookmark"`
+	User       Nullable[string] `json:"user"`
+	Role       Nullable[string] `json:"role"`
+	Collection string           `json:"collection"`
+	Layout     Nullable[string] `json:"layout"`
+	Icon       Nullable[string] `json:"icon"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (preset *Preset) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, preset, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	preset.Unknown = values
+	return nil
+}
+
+func (preset *Preset) MarshalJSON() ([]byte, error) {
+	type alias Preset
+	base, err := json.Marshal((*alias)(preset))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range preset.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
