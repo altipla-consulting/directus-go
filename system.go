@@ -252,6 +252,7 @@ type Folder struct {
 	Name   string `json:"name"`
 	Parent string `json:"parent"`
 }
+
 type Preset struct {
 	ID         int64            `json:"id,omitempty"`
 	Bookmark   Nullable[string] `json:"bookmark"`
