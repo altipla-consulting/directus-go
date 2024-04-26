@@ -18,6 +18,7 @@ type Client struct {
 	Relations          *ResourceClient[RelationDefinition]
 	Roles              *ResourceClient[Role]
 	Users              *ResourceClient[User]
+	Presets            *ResourceClient[Preset]
 
 	Fields *clientFields
 
@@ -60,6 +61,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Relations = NewResourceClient[RelationDefinition](client, "relations")
 	client.Roles = NewResourceClient[Role](client, "roles")
 	client.Users = NewResourceClient[User](client, "users")
+	client.Presets = NewResourceClient[Preset](client, "presets")
 
 	client.Fields = &clientFields{client: client}
 
