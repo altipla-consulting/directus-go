@@ -289,3 +289,41 @@ func (preset *Preset) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(m)
 }
+
+type Flow struct {
+	ID             string           `json:"id,omitempty"`
+	Name           string           `json:"name"`
+	Status         string           `json:"status"`
+	Description    Nullable[string] `json:"description"`
+	Accountability Accountability   `json:"accountability"`
+	Color          string           `json:"color,omitempty"`
+	Icon           Icon             `json:"icon,omitempty"`
+	Operation      Nullable[string] `json:"operation"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (flow *Flow) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, flow, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	flow.Unknown = values
+	return nil
+}
+
+func (flow *Flow) MarshalJSON() ([]byte, error) {
+	type alias Flow
+	base, err := json.Marshal((*alias)(flow))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range flow.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
