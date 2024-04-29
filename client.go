@@ -120,6 +120,9 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 	case req.Method == http.MethodPatch && resp.StatusCode == http.StatusNoContent:
 		return ErrItemNotFound
 
+	case req.Method == http.MethodPost && resp.StatusCode == http.StatusNoContent:
+		return ErrEmpty
+
 	default:
 		return &unexpectedStatusError{
 			status: resp.StatusCode,

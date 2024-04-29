@@ -9,6 +9,8 @@ import (
 var (
 	// ErrItemNotFound is returned when the item is not found in the collection.
 	ErrItemNotFound = errors.New("directus: item not found")
+	// ErrIEmpty is returned when the item is returned empty.
+	ErrEmpty = errors.New("directus: empty")
 )
 
 type unexpectedStatusError struct {
