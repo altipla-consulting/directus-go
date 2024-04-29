@@ -20,6 +20,7 @@ type Client struct {
 	Users              *ResourceClient[User]
 	Presets            *ResourceClient[Preset]
 	Operations         *ResourceClient[Operation]
+	Flows              *ResourceClient[Flow]
 
 	Fields *clientFields
 
@@ -64,6 +65,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Users = NewResourceClient[User](client, "users")
 	client.Presets = NewResourceClient[Preset](client, "presets")
 	client.Operations = NewResourceClient[Operation](client, "operations")
+	client.Flows = NewResourceClient[Flow](client, "flows")
 
 	client.Fields = &clientFields{client: client}
 
@@ -119,8 +121,8 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 			return reply.Errors[0]
 		}
 
-	case req.Method == http.MethodPatch && resp.StatusCode == http.StatusNoContent:
-		return ErrItemNotFound
+	case (req.Method == http.MethodPost || req.Method == http.MethodPatch) && resp.StatusCode == http.StatusNoContent:
+		return ErrEmpty
 
 	default:
 		return &unexpectedStatusError{
