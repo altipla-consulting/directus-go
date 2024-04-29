@@ -295,8 +295,8 @@ type Operation struct {
 	ID        string           `json:"id,omitempty"`
 	Flow      string           `json:"flow"`
 	Key       string           `json:"key"`
-	PositionX int64            `json:"position_x"`
-	PositionY int64            `json:"position_y"`
+	PositionX int32            `json:"position_x"`
+	PositionY int32            `json:"position_y"`
 	Type      string           `json:"type"`
 	Name      Nullable[string] `json:"name"`
 	Reject    Nullable[string] `json:"reject"`
