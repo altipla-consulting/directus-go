@@ -300,6 +300,8 @@ type Operation struct {
 	Name      Nullable[string] `json:"name"`
 	Reject    Nullable[string] `json:"reject"`
 	Resolve   Nullable[string] `json:"resolve"`
+
+	Unknown map[string]any `json:"-"`
 }
 
 func (operation *Operation) UnmarshalJSON(data []byte) error {
@@ -314,6 +316,18 @@ func (operation *Operation) UnmarshalJSON(data []byte) error {
 func (operation *Operation) MarshalJSON() ([]byte, error) {
 	type alias Operation
 	base, err := json.Marshal((*alias)(operation))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range operation.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
 
 type Flow struct {
 	ID             string           `json:"id,omitempty"`
@@ -328,7 +342,7 @@ type Flow struct {
 
 	Unknown map[string]any `json:"-"`
 }
-  
+
 func (flow *Flow) UnmarshalJSON(data []byte) error {
 	values, err := marshmallow.Unmarshal(data, flow, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
@@ -345,7 +359,6 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	m := make(map[string]any)
-	for k, v := range operation.Unknown {
 	for k, v := range flow.Unknown {
 		m[k] = v
 	}
