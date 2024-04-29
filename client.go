@@ -117,8 +117,8 @@ func (client *Client) sendRequest(req *http.Request, dest interface{}) error {
 			return reply.Errors[0]
 		}
 
-	case req.Method == http.MethodPatch && resp.StatusCode == http.StatusNoContent:
-		return ErrItemNotFound
+	case (req.Method == http.MethodPost || req.Method == http.MethodPatch) && resp.StatusCode == http.StatusNoContent:
+		return ErrEmpty
 
 	default:
 		return &unexpectedStatusError{
