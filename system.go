@@ -339,7 +339,6 @@ type Flow struct {
 	Icon           Icon             `json:"icon,omitempty"`
 	Operation      Nullable[string] `json:"operation"`
 
-
 	Unknown map[string]any `json:"-"`
 }
 
