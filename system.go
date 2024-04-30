@@ -386,10 +386,10 @@ type File struct {
 	Tags            Nullable[string] `json:"tags"`
 	Embed           Nullable[string] `json:"embed"`
 	FilenameDisk    Nullable[string] `json:"filename_disk"`
-  
-  Unknown map[string]any `json:"-"`
+
+	Unknown map[string]any `json:"-"`
 }
-  
+
 type PermissionAction string
 
 const (
@@ -408,7 +408,6 @@ type Permission struct {
 
 	Unknown map[string]any `json:"-"`
 }
-
 
 func (file *File) UnmarshalJSON(data []byte) error {
 	values, err := marshmallow.Unmarshal(data, file, marshmallow.WithExcludeKnownFieldsFromMap(true))
@@ -433,9 +432,9 @@ func (file *File) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(m)
-  
+
 }
-  
+
 type Dashboard struct {
 	ID    Nullable[string] `json:"id"`
 	Name  string           `json:"name"`
@@ -486,23 +485,23 @@ func (permission *Permission) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-func (panels *Panel) UnmarshalJSON(data []byte) error {
-	values, err := marshmallow.Unmarshal(data, panels, marshmallow.WithExcludeKnownFieldsFromMap(true))
+func (panel *Panel) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, panel, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
 		return err
 	}
-	panels.Unknown = values
+	panel.Unknown = values
 	return nil
 }
 
-func (panels *Panel) MarshalJSON() ([]byte, error) {
+func (panel *Panel) MarshalJSON() ([]byte, error) {
 	type alias Panel
-	base, err := json.Marshal((*alias)(panels))
+	base, err := json.Marshal((*alias)(panel))
 	if err != nil {
 		return nil, err
 	}
 	m := make(map[string]any)
-	for k, v := range file.Unknown {
+	for k, v := range panel.Unknown {
 		m[k] = v
 	}
 	if err := json.Unmarshal(base, &m); err != nil {
