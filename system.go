@@ -328,15 +328,6 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-type FileStorage string
-
-const (
-	FieldStorageLocal FileStorage = "local"
-	FieldStorageAzure FileStorage = "azure"
-	FieldStorageS3    FileStorage = "s3"
-	FieldStorageGCS   FileStorage = "gcs"
-)
-
 type File struct {
 	FileSize        Nullable[int64]  `json:"file_size"`
 	ID              string           `json:"id,omitempty"`
@@ -344,7 +335,7 @@ type File struct {
 	Title           Nullable[string] `json:"title"`
 	Type            Nullable[string] `json:"type"`
 	Description     Nullable[string] `json:"description"`
-	Storage         FileStorage      `json:"storage"`
+	Storage         string           `json:"storage"`
 	Charset         Nullable[string] `json:"charset"`
 	FilenameDowload string           `json:"filename_download"`
 	FocalPointX     Nullable[int32]  `json:"focal_point_x"`
