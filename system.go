@@ -331,10 +331,10 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 type PermissionAction string
 
 const (
-	permissionActionCreate PermissionAction = "create"
-	permissionActionRead   PermissionAction = "read"
-	permissionActionUpdate PermissionAction = "update"
-	permissionActionDelete PermissionAction = "delete"
+	PermissionActionCreate PermissionAction = "create"
+	PermissionActionRead   PermissionAction = "read"
+	PermissionActionUpdate PermissionAction = "update"
+	PermissionActionDelete PermissionAction = "delete"
 )
 
 type Permission struct {
