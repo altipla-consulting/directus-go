@@ -382,6 +382,8 @@ type Permission struct {
 	Collection string           `json:"collection"`
 	Action     PermissionAction `json:"action"`
 	Fields     Nullable[string] `json:"fields"`
+
+	Unknown map[string]any `json:"-"`
 }
 
 type Dashboard struct {
@@ -409,7 +411,6 @@ type Panel struct {
 	Unknown map[string]any `json:"-"`
 }
 
-
 func (permission *Permission) UnmarshalJSON(data []byte) error {
 	values, err := marshmallow.Unmarshal(data, permission, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
@@ -422,17 +423,17 @@ func (permission *Permission) UnmarshalJSON(data []byte) error {
 func (permission *Permission) MarshalJSON() ([]byte, error) {
 	type alias Permission
 	base, err := json.Marshal((*alias)(permission))
-  if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	m := make(map[string]any)
-	for k, v := range flow.Unknown {
+	for k, v := range permission.Unknown {
 		m[k] = v
 	}
 	if err := json.Unmarshal(base, &m); err != nil {
 		return nil, err
 	}
-	return json.Marshal(m)  
+	return json.Marshal(m)
 }
 
 func (panels *Panel) UnmarshalJSON(data []byte) error {
