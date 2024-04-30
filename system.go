@@ -366,3 +366,53 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(m)
 }
+
+type Dashboard struct {
+	ID    Nullable[string] `json:"id"`
+	Name  string           `json:"name"`
+	Icon  Icon             `json:"icon"`
+	Color Nullable[string] `json:"color"`
+	Note  Nullable[string] `json:"note"`
+}
+
+type Panel struct {
+	ID         Nullable[string] `json:"id"`
+	Dashboard  string           `json:"dashboard"`
+	Height     int32            `json:"height"`
+	Width      int32            `json:"width"`
+	PositionX  int32            `json:"position_x"`
+	PositionY  int32            `json:"position_y"`
+	ShowHeader bool             `json:"show_header"`
+	Type       string           `json:"type"`
+	Color      Nullable[string] `json:"color"`
+	Icon       Icon             `json:"icon"`
+	Name       Nullable[string] `json:"name"`
+	Note       Nullable[string] `json:"note"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (panels *Panel) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, panels, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	panels.Unknown = values
+	return nil
+}
+
+func (panels *Panel) MarshalJSON() ([]byte, error) {
+	type alias Panel
+	base, err := json.Marshal((*alias)(panels))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range panels.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}

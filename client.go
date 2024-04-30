@@ -21,6 +21,8 @@ type Client struct {
 	Presets            *ResourceClient[Preset]
 	Operations         *ResourceClient[Operation]
 	Flows              *ResourceClient[Flow]
+	Dashboard          *ResourceClient[Dashboard]
+	Panels             *ResourceClient[Panel]
 
 	Fields *clientFields
 
@@ -66,6 +68,8 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Presets = NewResourceClient[Preset](client, "presets")
 	client.Operations = NewResourceClient[Operation](client, "operations")
 	client.Flows = NewResourceClient[Flow](client, "flows")
+	client.Dashboard = NewResourceClient[Dashboard](client, "dashboard")
+	client.Panels = NewResourceClient[Panel](client, "panels")
 
 	client.Fields = &clientFields{client: client}
 
