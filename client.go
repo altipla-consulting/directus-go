@@ -72,7 +72,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Flows = NewResourceClient[Flow](client, "flows")
 	client.Files = NewResourceClient[File](client, "files")
 	client.Permissions = NewResourceClient[Permission](client, "permissions")
-	client.Dashboards = NewResourceClient[Dashboard](client, "dashboard")
+	client.Dashboards = NewResourceClient[Dashboard](client, "dashboards")
 	client.Panels = NewResourceClient[Panel](client, "panels")
 
 	client.Fields = &clientFields{client: client}
