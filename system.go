@@ -327,3 +327,47 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(m)
 }
+
+type PermissionAction string
+
+const (
+	permissionActionCreate PermissionAction = "create"
+	permissionActionRead   PermissionAction = "read"
+	permissionActionUpdate PermissionAction = "update"
+	permissionActionDelete PermissionAction = "delete"
+)
+
+type Permission struct {
+	ID         int64            `json:"id,omitempty"`
+	Role       Nullable[string] `json:"role"`
+	Collection string           `json:"collection"`
+	Action     PermissionAction `json:"action"`
+	Fields     Nullable[string] `json:"fields"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (permission *Permission) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, permission, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	permission.Unknown = values
+	return nil
+}
+
+func (permission *Permission) MarshalJSON() ([]byte, error) {
+	type alias Permission
+	base, err := json.Marshal((*alias)(permission))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range permission.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
