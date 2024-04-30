@@ -327,3 +327,60 @@ func (flow *Flow) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(m)
 }
+
+type FileStorage string
+
+const (
+	FieldStorageLocal FileStorage = "local"
+	FieldStorageAzure FileStorage = "azure"
+	FieldStorageS3    FileStorage = "s3"
+	FieldStorageGCS   FileStorage = "gcs"
+)
+
+type File struct {
+	FileSize        Nullable[int64]  `json:"file_size"`
+	ID              string           `json:"id,omitempty"`
+	Folder          Nullable[string] `json:"folder"`
+	Title           Nullable[string] `json:"title"`
+	Type            Nullable[string] `json:"type"`
+	Description     Nullable[string] `json:"description"`
+	Storage         FileStorage      `json:"storage"`
+	Charset         Nullable[string] `json:"charset"`
+	FilenameDowload string           `json:"filename_download"`
+	FocalPointX     Nullable[int32]  `json:"focal_point_x"`
+	FocalPointY     Nullable[int32]  `json:"focal_point_y"`
+	Width           Nullable[int32]  `json:"width"`
+	Height          Nullable[int32]  `json:"height"`
+	Duration        Nullable[int32]  `json:"duration"`
+	Location        Nullable[string] `json:"location"`
+	Tags            Nullable[string] `json:"tags"`
+	Embed           Nullable[string] `json:"embed"`
+	FilenameDisk    Nullable[string] `json:"filename_disk"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (file *File) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, file, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	file.Unknown = values
+	return nil
+}
+
+func (file *File) MarshalJSON() ([]byte, error) {
+	type alias File
+	base, err := json.Marshal((*alias)(file))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range file.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
