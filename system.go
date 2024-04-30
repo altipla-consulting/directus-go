@@ -390,25 +390,6 @@ type File struct {
 	Unknown map[string]any `json:"-"`
 }
 
-type PermissionAction string
-
-const (
-	PermissionActionCreate PermissionAction = "create"
-	PermissionActionRead   PermissionAction = "read"
-	PermissionActionUpdate PermissionAction = "update"
-	PermissionActionDelete PermissionAction = "delete"
-)
-
-type Permission struct {
-	ID         int64            `json:"id,omitempty"`
-	Role       Nullable[string] `json:"role"`
-	Collection string           `json:"collection"`
-	Action     PermissionAction `json:"action"`
-	Fields     Nullable[string] `json:"fields"`
-
-	Unknown map[string]any `json:"-"`
-}
-
 func (file *File) UnmarshalJSON(data []byte) error {
 	values, err := marshmallow.Unmarshal(data, file, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
@@ -435,27 +416,21 @@ func (file *File) MarshalJSON() ([]byte, error) {
 
 }
 
-type Dashboard struct {
-	ID    Nullable[string] `json:"id"`
-	Name  string           `json:"name"`
-	Icon  Icon             `json:"icon"`
-	Color Nullable[string] `json:"color"`
-	Note  Nullable[string] `json:"note"`
-}
+type PermissionAction string
 
-type Panel struct {
-	ID         Nullable[string] `json:"id"`
-	Dashboard  string           `json:"dashboard"`
-	Height     int32            `json:"height"`
-	Width      int32            `json:"width"`
-	PositionX  int32            `json:"position_x"`
-	PositionY  int32            `json:"position_y"`
-	ShowHeader bool             `json:"show_header"`
-	Type       string           `json:"type"`
-	Color      Nullable[string] `json:"color"`
-	Icon       Icon             `json:"icon"`
-	Name       Nullable[string] `json:"name"`
-	Note       Nullable[string] `json:"note"`
+const (
+	PermissionActionCreate PermissionAction = "create"
+	PermissionActionRead   PermissionAction = "read"
+	PermissionActionUpdate PermissionAction = "update"
+	PermissionActionDelete PermissionAction = "delete"
+)
+
+type Permission struct {
+	ID         int64            `json:"id,omitempty"`
+	Role       Nullable[string] `json:"role"`
+	Collection string           `json:"collection"`
+	Action     PermissionAction `json:"action"`
+	Fields     Nullable[string] `json:"fields"`
 
 	Unknown map[string]any `json:"-"`
 }
@@ -483,6 +458,31 @@ func (permission *Permission) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(m)
+}
+
+type Dashboard struct {
+	ID    Nullable[string] `json:"id"`
+	Name  string           `json:"name"`
+	Icon  Icon             `json:"icon"`
+	Color Nullable[string] `json:"color"`
+	Note  Nullable[string] `json:"note"`
+}
+
+type Panel struct {
+	ID         Nullable[string] `json:"id"`
+	Dashboard  string           `json:"dashboard"`
+	Height     int32            `json:"height"`
+	Width      int32            `json:"width"`
+	PositionX  int32            `json:"position_x"`
+	PositionY  int32            `json:"position_y"`
+	ShowHeader bool             `json:"show_header"`
+	Type       string           `json:"type"`
+	Color      Nullable[string] `json:"color"`
+	Icon       Icon             `json:"icon"`
+	Name       Nullable[string] `json:"name"`
+	Note       Nullable[string] `json:"note"`
+
+	Unknown map[string]any `json:"-"`
 }
 
 func (panel *Panel) UnmarshalJSON(data []byte) error {
