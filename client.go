@@ -15,7 +15,6 @@ type Client struct {
 	Collections        *ResourceClient[Collection, string]
 	CustomTranslations *ResourceClient[CustomTranslation, string]
 	Folders            *ResourceClient[Folder, string]
-	Relations          *ResourceClient[RelationDefinition, int64]
 	Roles              *ResourceClient[Role, string]
 	Users              *ResourceClient[User, string]
 	Presets            *ResourceClient[Preset, int64]
@@ -25,8 +24,8 @@ type Client struct {
 	Permissions        *ResourceClient[Permission, string]
 	Dashboards         *ResourceClient[Dashboard, string]
 	Panels             *ResourceClient[Panel, string]
-
-	Fields *clientFields
+	Relations          *clientRelations
+	Fields             *clientFields
 
 	instance, token string
 	logger          *slog.Logger
@@ -64,7 +63,6 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Collections = NewResourceClient[Collection, string](client, "collections")
 	client.CustomTranslations = NewResourceClient[CustomTranslation, string](client, "translations")
 	client.Folders = NewResourceClient[Folder, string](client, "folders")
-	client.Relations = NewResourceClient[RelationDefinition, int64](client, "relations")
 	client.Roles = NewResourceClient[Role, string](client, "roles")
 	client.Users = NewResourceClient[User, string](client, "users")
 	client.Presets = NewResourceClient[Preset, int64](client, "presets")
@@ -74,8 +72,8 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Permissions = NewResourceClient[Permission, string](client, "permissions")
 	client.Dashboards = NewResourceClient[Dashboard, string](client, "dashboards")
 	client.Panels = NewResourceClient[Panel, string](client, "panels")
-
 	client.Fields = &clientFields{client: client}
+	client.Relations = &clientRelations{client: client}
 
 	return client
 }
