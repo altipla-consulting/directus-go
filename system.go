@@ -291,15 +291,16 @@ func (preset *Preset) MarshalJSON() ([]byte, error) {
 }
 
 type Operation struct {
-	ID        string           `json:"id,omitempty"`
-	Flow      string           `json:"flow"`
-	Key       string           `json:"key"`
-	PositionX int32            `json:"position_x"`
-	PositionY int32            `json:"position_y"`
-	Type      string           `json:"type"`
-	Name      Nullable[string] `json:"name"`
-	Reject    Nullable[string] `json:"reject"`
-	Resolve   Nullable[string] `json:"resolve"`
+	ID          string           `json:"id,omitempty"`
+	Flow        string           `json:"flow"`
+	Key         string           `json:"key"`
+	PositionX   int32            `json:"position_x"`
+	PositionY   int32            `json:"position_y"`
+	Type        string           `json:"type"`
+	Name        Nullable[string] `json:"name"`
+	Reject      Nullable[string] `json:"reject"`
+	Resolve     Nullable[string] `json:"resolve"`
+	UserCreated Nullable[string] `json:"user_created"`
 
 	Unknown map[string]any `json:"-"`
 }
