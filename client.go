@@ -75,6 +75,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Panels = NewResourceClient[Panel, string](client, "panels")
 	client.Fields = &clientFields{client: client}
 	client.Relations = &clientRelations{client: client}
+	client.Settings = &clientSettings{client: client}
 
 	return client
 }
