@@ -17,7 +17,7 @@ type Settings struct {
 	ProjectColor      string           `json:"project_color"`
 
 	DefaultLanguage string      `json:"default_language"`
-	ModuleBar       []ModuleBar `json:"module_bar"`
+	ModuleBar       []ModuleBar `json:"module_bar,omitempty"`
 
 	AuthPasswordPolicy string `json:"auth_password_policy"`
 	AuthLoginAttempts  int32  `json:"auth_login_attempts"`
