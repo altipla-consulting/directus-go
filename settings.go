@@ -69,6 +69,15 @@ const (
 	ModuleBarTypeModule ModuleBarType = "module"
 )
 
+func (tp *ModuleBarType) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*tp = ModuleBarType(str)
+	return nil
+}
+
 type clientSettings struct {
 	client *Client
 }
