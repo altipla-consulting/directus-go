@@ -12,19 +12,19 @@ import (
 
 // Client keeps a connection to a Directus instance.
 type Client struct {
-	Collections        *ResourceClient[Collection]
-	CustomTranslations *ResourceClient[CustomTranslation]
-	Folders            *ResourceClient[Folder]
-	Relations          *ResourceClient[RelationDefinition]
-	Roles              *ResourceClient[Role]
-	Users              *ResourceClient[User]
-	Presets            *ResourceClient[Preset]
-	Operations         *ResourceClient[Operation]
-	Flows              *ResourceClient[Flow]
-	Files              *ResourceClient[File]
-	Permissions        *ResourceClient[Permission]
-	Dashboards         *ResourceClient[Dashboard]
-	Panels             *ResourceClient[Panel]
+	Collections        *ResourceClient[Collection, string]
+	CustomTranslations *ResourceClient[CustomTranslation, string]
+	Folders            *ResourceClient[Folder, string]
+	Relations          *ResourceClient[RelationDefinition, int64]
+	Roles              *ResourceClient[Role, string]
+	Users              *ResourceClient[User, string]
+	Presets            *ResourceClient[Preset, string]
+	Operations         *ResourceClient[Operation, string]
+	Flows              *ResourceClient[Flow, string]
+	Files              *ResourceClient[File, string]
+	Permissions        *ResourceClient[Permission, string]
+	Dashboards         *ResourceClient[Dashboard, string]
+	Panels             *ResourceClient[Panel, string]
 
 	Fields *clientFields
 
@@ -61,19 +61,19 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 		opt(client)
 	}
 
-	client.Collections = NewResourceClient[Collection](client, "collections")
-	client.CustomTranslations = NewResourceClient[CustomTranslation](client, "translations")
-	client.Folders = NewResourceClient[Folder](client, "folders")
-	client.Relations = NewResourceClient[RelationDefinition](client, "relations")
-	client.Roles = NewResourceClient[Role](client, "roles")
-	client.Users = NewResourceClient[User](client, "users")
-	client.Presets = NewResourceClient[Preset](client, "presets")
-	client.Operations = NewResourceClient[Operation](client, "operations")
-	client.Flows = NewResourceClient[Flow](client, "flows")
-	client.Files = NewResourceClient[File](client, "files")
-	client.Permissions = NewResourceClient[Permission](client, "permissions")
-	client.Dashboards = NewResourceClient[Dashboard](client, "dashboards")
-	client.Panels = NewResourceClient[Panel](client, "panels")
+	client.Collections = NewResourceClient[Collection, string](client, "collections")
+	client.CustomTranslations = NewResourceClient[CustomTranslation, string](client, "translations")
+	client.Folders = NewResourceClient[Folder, string](client, "folders")
+	client.Relations = NewResourceClient[RelationDefinition, int64](client, "relations")
+	client.Roles = NewResourceClient[Role, string](client, "roles")
+	client.Users = NewResourceClient[User, string](client, "users")
+	client.Presets = NewResourceClient[Preset, string](client, "presets")
+	client.Operations = NewResourceClient[Operation, string](client, "operations")
+	client.Flows = NewResourceClient[Flow, string](client, "flows")
+	client.Files = NewResourceClient[File, string](client, "files")
+	client.Permissions = NewResourceClient[Permission, string](client, "permissions")
+	client.Dashboards = NewResourceClient[Dashboard, string](client, "dashboards")
+	client.Panels = NewResourceClient[Panel, string](client, "panels")
 
 	client.Fields = &clientFields{client: client}
 

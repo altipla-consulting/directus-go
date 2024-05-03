@@ -8,16 +8,16 @@ import (
 	"net/http"
 )
 
-type ResourceClient[T any] struct {
+type ResourceClient[T any, PK string | int64] struct {
 	client   *Client
 	endpoint string
 }
 
-func NewResourceClient[T any](client *Client, endpoint string) *ResourceClient[T] {
-	return &ResourceClient[T]{client, endpoint}
+func NewResourceClient[T any, PK string | int64](client *Client, endpoint string) *ResourceClient[T, PK] {
+	return &ResourceClient[T, PK]{client, endpoint}
 }
 
-func (rc *ResourceClient[T]) List(ctx context.Context) ([]*T, error) {
+func (rc *ResourceClient[T, PK]) List(ctx context.Context) ([]*T, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.client.urlf("/%s", rc.endpoint), nil)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
@@ -31,7 +31,7 @@ func (rc *ResourceClient[T]) List(ctx context.Context) ([]*T, error) {
 	return reply.Data, nil
 }
 
-func (rc *ResourceClient[T]) Get(ctx context.Context, id string) (*T, error) {
+func (rc *ResourceClient[T, PK]) Get(ctx context.Context, id PK) (*T, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.client.urlf("/%s/%s", rc.endpoint, id), nil)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
@@ -43,7 +43,7 @@ func (rc *ResourceClient[T]) Get(ctx context.Context, id string) (*T, error) {
 	return &reply, nil
 }
 
-func (rc *ResourceClient[T]) Create(ctx context.Context, item *T) (*T, error) {
+func (rc *ResourceClient[T, PK]) Create(ctx context.Context, item *T) (*T, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(item); err != nil {
 		return nil, fmt.Errorf("directus: cannot encode request: %v", err)
@@ -59,7 +59,7 @@ func (rc *ResourceClient[T]) Create(ctx context.Context, item *T) (*T, error) {
 	return &reply, nil
 }
 
-func (rc *ResourceClient[T]) Delete(ctx context.Context, id string) error {
+func (rc *ResourceClient[T, PK]) Delete(ctx context.Context, id PK) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, rc.client.urlf("/%s/%s", rc.endpoint, id), nil)
 	if err != nil {
 		return fmt.Errorf("directus: cannot prepare request: %v", err)
@@ -67,7 +67,7 @@ func (rc *ResourceClient[T]) Delete(ctx context.Context, id string) error {
 	return rc.client.sendRequest(req, nil)
 }
 
-func (rc *ResourceClient[T]) Patch(ctx context.Context, id string, item *T) (*T, error) {
+func (rc *ResourceClient[T, PK]) Patch(ctx context.Context, id PK, item *T) (*T, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(item); err != nil {
 		return nil, fmt.Errorf("directus: cannot encode request: %v", err)
