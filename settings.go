@@ -78,11 +78,13 @@ func (cr *clientSettings) Get(ctx context.Context) (*Settings, error) {
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply Settings
+	reply := struct {
+		Data *Settings `json:"data"`
+	}{}
 	if err := cr.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
 
 func (cr *clientSettings) Update(ctx context.Context, settings *Settings) (*Settings, error) {
@@ -94,9 +96,11 @@ func (cr *clientSettings) Update(ctx context.Context, settings *Settings) (*Sett
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply Settings
+	reply := struct {
+		Data *Settings `json:"data"`
+	}{}
 	if err := cr.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
