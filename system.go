@@ -462,7 +462,7 @@ func (permission *Permission) MarshalJSON() ([]byte, error) {
 }
 
 type Dashboard struct {
-	ID    Nullable[string] `json:"id"`
+	ID    string           `json:"id,omitempty"`
 	Name  string           `json:"name"`
 	Icon  Icon             `json:"icon"`
 	Color Nullable[string] `json:"color"`
