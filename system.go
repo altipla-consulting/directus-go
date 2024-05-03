@@ -470,7 +470,7 @@ type Dashboard struct {
 }
 
 type Panel struct {
-	ID         Nullable[string] `json:"id"`
+	ID         string           `json:"id,omitempty"`
 	Dashboard  string           `json:"dashboard"`
 	Height     int32            `json:"height"`
 	Width      int32            `json:"width"`
