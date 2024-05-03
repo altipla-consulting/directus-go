@@ -26,6 +26,7 @@ type Client struct {
 	Panels             *ResourceClient[Panel, string]
 	Relations          *clientRelations
 	Fields             *clientFields
+	Settings           *clientSettings
 
 	instance, token string
 	logger          *slog.Logger
