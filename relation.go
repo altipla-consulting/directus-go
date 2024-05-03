@@ -91,10 +91,10 @@ type RelationDefinition struct {
 }
 
 type RelationSchema struct {
-	Table    string         `json:"table"`
-	Column   string         `json:"column"`
-	OnUpdate RelationAction `json:"on_update"`
-	OnDelete RelationAction `json:"on_delete"`
+	Table    string         `json:"table,omitempty"`
+	Column   string         `json:"column,omitempty"`
+	OnUpdate RelationAction `json:"on_update,omitempty"`
+	OnDelete RelationAction `json:"on_delete,omitempty"`
 
 	Unknown map[string]any `json:"-"`
 }
