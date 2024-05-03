@@ -19,8 +19,8 @@ type Settings struct {
 	DefaultLanguage string      `json:"default_language"`
 	ModuleBar       []ModuleBar `json:"module_bar,omitempty"`
 
-	AuthPasswordPolicy string `json:"auth_password_policy"`
-	AuthLoginAttempts  int32  `json:"auth_login_attempts"`
+	AuthPasswordPolicy Nullable[string] `json:"auth_password_policy"`
+	AuthLoginAttempts  int32            `json:"auth_login_attempts"`
 
 	CustomCSS Nullable[string] `json:"custom_css"`
 
