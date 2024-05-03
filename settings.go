@@ -54,7 +54,7 @@ func (settings *Settings) MarshalJSON() ([]byte, error) {
 
 type ModuleBar struct {
 	ID      string        `json:"id"`
-	Locked  bool          `json:"locked"`
+	Locked  bool          `json:"locked,omitempty"`
 	Enabled bool          `json:"enabled"`
 	Type    ModuleBarType `json:"type"`
 	Name    string        `json:"name,omitempty"`
