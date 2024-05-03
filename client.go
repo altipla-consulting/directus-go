@@ -18,7 +18,7 @@ type Client struct {
 	Relations          *ResourceClient[RelationDefinition, int64]
 	Roles              *ResourceClient[Role, string]
 	Users              *ResourceClient[User, string]
-	Presets            *ResourceClient[Preset, string]
+	Presets            *ResourceClient[Preset, int64]
 	Operations         *ResourceClient[Operation, string]
 	Flows              *ResourceClient[Flow, string]
 	Files              *ResourceClient[File, string]
@@ -67,7 +67,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Relations = NewResourceClient[RelationDefinition, int64](client, "relations")
 	client.Roles = NewResourceClient[Role, string](client, "roles")
 	client.Users = NewResourceClient[User, string](client, "users")
-	client.Presets = NewResourceClient[Preset, string](client, "presets")
+	client.Presets = NewResourceClient[Preset, int64](client, "presets")
 	client.Operations = NewResourceClient[Operation, string](client, "operations")
 	client.Flows = NewResourceClient[Flow, string](client, "flows")
 	client.Files = NewResourceClient[File, string](client, "files")
