@@ -373,11 +373,11 @@ func (action *PermissionAction) MarshalJSON() ([]byte, error) {
 }
 
 type Permission struct {
-	ID         int64            `json:"id,omitempty"`
-	Role       Nullable[string] `json:"role"`
-	Collection string           `json:"collection"`
-	Action     PermissionAction `json:"action"`
-	Fields     Nullable[string] `json:"fields"`
+	ID         int64              `json:"id,omitempty"`
+	Role       Nullable[string]   `json:"role"`
+	Collection string             `json:"collection"`
+	Action     PermissionAction   `json:"action"`
+	Fields     Nullable[[]string] `json:"fields"`
 
 	Unknown map[string]any `json:"-"`
 }
