@@ -83,6 +83,15 @@ const (
 	FieldWidthHalf FieldWidth = "half"
 )
 
+func (width *FieldWidth) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*width = FieldWidth(str)
+	return nil
+}
+
 type FieldSpecial string
 
 const (
