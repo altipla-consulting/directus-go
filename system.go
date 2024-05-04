@@ -378,6 +378,7 @@ type Permission struct {
 	Collection string             `json:"collection"`
 	Action     PermissionAction   `json:"action"`
 	Fields     Nullable[[]string] `json:"fields"`
+	System     bool               `json:"system,omitempty"`
 
 	Unknown map[string]any `json:"-"`
 }
