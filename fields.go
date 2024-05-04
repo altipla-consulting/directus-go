@@ -51,6 +51,22 @@ func (meta *FieldMeta) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (meta *FieldMeta) MarshalJSON() ([]byte, error) {
+	type alias FieldMeta
+	base, err := json.Marshal((*alias)(meta))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range meta.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
 func (meta *FieldMeta) HasSpecial(special FieldSpecial) bool {
 	for _, s := range meta.Special {
 		if s == special {
@@ -113,6 +129,22 @@ func (schema *FieldSchema) UnmarshalJSON(data []byte) error {
 	}
 	schema.Unknown = values
 	return nil
+}
+
+func (schema *FieldSchema) MarshalJSON() ([]byte, error) {
+	type alias FieldSchema
+	base, err := json.Marshal((*alias)(schema))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range schema.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
 }
 
 type clientFields struct {
