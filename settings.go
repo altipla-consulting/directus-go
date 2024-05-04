@@ -58,7 +58,7 @@ type ModuleBar struct {
 	Enabled bool          `json:"enabled"`
 	Type    ModuleBarType `json:"type"`
 	Name    string        `json:"name,omitempty"`
-	Icon    string        `json:"icon,omitempty"`
+	Icon    Icon          `json:"icon,omitempty"`
 	URL     string        `json:"url,omitempty"`
 }
 

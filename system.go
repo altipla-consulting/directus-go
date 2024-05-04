@@ -29,8 +29,6 @@ type User struct {
 	ExternalIdentifier string `json:"external_identifier,omitempty"`
 }
 
-type Icon string
-
 type Collection struct {
 	Collection string            `json:"collection"`
 	Meta       CollectionMeta    `json:"meta"`
@@ -104,6 +102,19 @@ const (
 	CollectionCollapseLocked CollectionCollapse = "locked"
 )
 
+func (collapse *CollectionCollapse) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*collapse = CollectionCollapse(str)
+	return nil
+}
+
+func (collapse *CollectionCollapse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(*collapse))
+}
+
 type CollectionSchema struct {
 	Name    string `json:"name"`
 	Comment string `json:"comment,omitempty"`
@@ -146,6 +157,19 @@ const (
 	AccountabilityAll      Accountability = "all"
 	AccountabilityActivity Accountability = "activity"
 )
+
+func (accountability *Accountability) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*accountability = Accountability(str)
+	return nil
+}
+
+func (accountability *Accountability) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(*accountability))
+}
 
 type CustomTranslation struct {
 	ID       string `json:"id,omitempty"`
@@ -334,6 +358,19 @@ const (
 	PermissionActionUpdate PermissionAction = "update"
 	PermissionActionDelete PermissionAction = "delete"
 )
+
+func (action *PermissionAction) UnmarshalJSON(data []byte) error {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*action = PermissionAction(str)
+	return nil
+}
+
+func (action *PermissionAction) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(*action))
+}
 
 type Permission struct {
 	ID         int64            `json:"id,omitempty"`
