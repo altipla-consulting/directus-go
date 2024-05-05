@@ -227,7 +227,7 @@ func (cr *clientRelations) Create(ctx context.Context, field *RelationDefinition
 	if err := json.NewEncoder(&buf).Encode(field); err != nil {
 		return nil, fmt.Errorf("directus: cannot encode request: %v", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cr.client.urlf("/relations/%s", field.Collection), &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cr.client.urlf("/relations"), &buf)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
