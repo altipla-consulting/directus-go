@@ -11,6 +11,7 @@ import (
 )
 
 type Settings struct {
+	ID                int32            `json:"id"`
 	ProjectName       string           `json:"project_name"`
 	ProjectURL        Nullable[string] `json:"project_url"`
 	ProjectDescriptor Nullable[string] `json:"project_descriptor"`
