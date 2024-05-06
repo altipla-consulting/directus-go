@@ -33,7 +33,7 @@ type Client struct {
 	bodyLogger      bool
 }
 
-// ClinetOption configures a client when creating it.
+// ClientOption configures a client when creating it.
 type ClientOption func(client *Client)
 
 // WithLogger sets a custom logger for the sent requests and responses received from the server.
