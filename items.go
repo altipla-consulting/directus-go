@@ -49,16 +49,7 @@ func WithSort(sort ...string) ReadOption {
 func WithLimit(limit int64) ReadOption {
 	return func(req *http.Request) {
 		q := req.URL.Query()
-		q.Add("limit", fmt.Sprintf("%d", limit))
-		req.URL.RawQuery = q.Encode()
-	}
-}
-
-// WithNoLimit returns all items of the collection.
-func WithNoLimit() ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
-		q.Add("limit", "-1")
+		q.Set("limit", fmt.Sprintf("%d", limit))
 		req.URL.RawQuery = q.Encode()
 	}
 }
@@ -132,6 +123,10 @@ func (items *ItemsClient[T]) List(ctx context.Context, opts ...ReadOption) ([]*T
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
+	// Return all items of the collection by default.
+	q := req.URL.Query()
+	q.Set("limit", "-1")
+	req.URL.RawQuery = q.Encode()
 	for _, opt := range items.opts {
 		opt(req)
 	}
