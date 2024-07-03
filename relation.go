@@ -20,6 +20,14 @@ func NewRelation[T any](data *T) Relation[T] {
 	return Relation[T]{value: data}
 }
 
+func NewRelationID[T any](id string) Relation[T] {
+	return Relation[T]{idstr: id}
+}
+
+func NewRelationNumericID[T any](id int64) Relation[T] {
+	return Relation[T]{idnum: id, idstr: fmt.Sprintf("%d", id)}
+}
+
 func (r Relation[T]) Value() *T {
 	if r.value == nil {
 		panic("directus: do not extract values from a relation without loaded fields")
