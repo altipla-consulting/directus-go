@@ -178,14 +178,26 @@ func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter, opts ...
 }
 
 // Get a single item by its primary key. If it cannot be found, it returns ErrItemNotFound.
-func (items *ItemsClient[T]) Get(ctx context.Context, id string) (*T, error) {
+func (items *ItemsClient[T]) Get(ctx context.Context, id string, opts ...ReadOption) (*T, error) {
 	if id == "" {
 		return nil, fmt.Errorf("%w: %v", ErrItemNotFound, id)
 	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, items.c.urlf("/items/%s/%s", items.collection, id), nil)
+	if err != nil {
+		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	for _, opt := range items.opts {
+		opt(req)
+	}
+	for _, opt := range opts {
+		opt(req)
+	}
+
 	reply := struct {
 		Data *T `json:"data"`
 	}{}
-	if err := items.itemsdo(ctx, http.MethodGet, items.c.urlf("/items/%s/%s", items.collection, id), nil, &reply); err != nil {
+	if err := items.c.sendRequest(req, &reply); err != nil {
 		var e *unexpectedStatusError
 		if errors.As(err, &e) && e.status == http.StatusForbidden {
 			return nil, fmt.Errorf("%w: %v", ErrItemNotFound, id)
