@@ -10,6 +10,10 @@ type Nullable[T any] struct {
 	Valid bool
 }
 
+func NewNullableValue[T any](value T) Nullable[T] {
+	return Nullable[T]{Value: value, Valid: true}
+}
+
 func (n Nullable[T]) String() string {
 	if n.Valid {
 		return fmt.Sprintf("%+v", n.Value)
