@@ -142,7 +142,7 @@ type FieldOptions struct {
 }
 
 func (options *FieldOptions) UnmarshalJSON(data []byte) error {
-	values, err := marshmallow.Unmarshal(data, options.unknown, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	values, err := marshmallow.Unmarshal(data, options, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
 		return err
 	}
