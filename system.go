@@ -66,6 +66,8 @@ type CollectionMeta struct {
 
 	DisplayTemplate string `json:"display_template,omitempty"`
 
+	Translations []*CollectionTranslation `json:"translations,omitempty"`
+
 	Unknown map[string]any `json:"-"`
 }
 
@@ -113,6 +115,13 @@ func (collapse *CollectionCollapse) UnmarshalJSON(data []byte) error {
 
 func (collapse *CollectionCollapse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(*collapse))
+}
+
+type CollectionTranslation struct {
+	Language    string `json:"language"`
+	Singular    string `json:"singular"`
+	Plural      string `json:"plural"`
+	Translation string `json:"translation"`
 }
 
 type CollectionSchema struct {
