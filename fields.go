@@ -136,7 +136,7 @@ type FieldTranslation struct {
 }
 
 type FieldOptions struct {
-	Choices []*FieldChoice `json:"choices,omitempty"`
+	Choices FieldChoices `json:"choices,omitempty"`
 
 	unknown map[string]any
 }
@@ -164,6 +164,32 @@ func (options *FieldOptions) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(m)
+}
+
+type FieldChoices struct {
+	Choices []*FieldChoice
+	Values  []any
+}
+
+func (choices *FieldChoices) UnmarshalJSON(data []byte) error {
+	var raw []json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	for _, rawchoice := range raw {
+		var c string
+		if err := json.Unmarshal(rawchoice, &c); err == nil {
+			choices.Values = append(choices.Values, c)
+			continue
+		}
+
+		var choice FieldChoice
+		if err := json.Unmarshal(rawchoice, &choice); err != nil {
+			return err
+		}
+		choices.Choices = append(choices.Choices, &choice)
+	}
+	return nil
 }
 
 type FieldChoice struct {
