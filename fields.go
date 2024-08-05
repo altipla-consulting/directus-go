@@ -39,6 +39,8 @@ type FieldMeta struct {
 	System  bool           `json:"system,omitempty"`
 	Special []FieldSpecial `json:"special,omitempty"`
 
+	Translations []*FieldTranslation `json:"translations,omitempty"`
+
 	Unknown map[string]any `json:"-"`
 }
 
@@ -74,6 +76,15 @@ func (meta *FieldMeta) HasSpecial(special FieldSpecial) bool {
 		}
 	}
 	return false
+}
+
+func (meta *FieldMeta) Translation(language string) *FieldTranslation {
+	for _, t := range meta.Translations {
+		if t.Language == language {
+			return t
+		}
+	}
+	return nil
 }
 
 type FieldWidth string
@@ -115,6 +126,11 @@ func (special *FieldSpecial) UnmarshalJSON(data []byte) error {
 	}
 	*special = FieldSpecial(value)
 	return nil
+}
+
+type FieldTranslation struct {
+	Language    string `json:"language"`
+	Translation string `json:"translation"`
 }
 
 type FieldSchema struct {
