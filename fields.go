@@ -41,6 +41,8 @@ type FieldMeta struct {
 
 	Translations []*FieldTranslation `json:"translations,omitempty"`
 
+	Options *FieldOptions `json:"options,omitempty"`
+
 	Unknown map[string]any `json:"-"`
 }
 
@@ -131,6 +133,42 @@ func (special *FieldSpecial) UnmarshalJSON(data []byte) error {
 type FieldTranslation struct {
 	Language    string `json:"language"`
 	Translation string `json:"translation"`
+}
+
+type FieldOptions struct {
+	Choices []*FieldChoice `json:"choices,omitempty"`
+
+	unknown map[string]any
+}
+
+func (options *FieldOptions) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, options.unknown, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	options.unknown = values
+	return nil
+}
+
+func (options *FieldOptions) MarshalJSON() ([]byte, error) {
+	type alias FieldOptions
+	base, err := json.Marshal((*alias)(options))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range options.unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
+type FieldChoice struct {
+	Text  string `json:"text"`
+	Value string `json:"value"`
 }
 
 type FieldSchema struct {
