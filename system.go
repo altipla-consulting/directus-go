@@ -96,6 +96,15 @@ func (meta *CollectionMeta) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
+func (meta *CollectionMeta) Translation(language string) *CollectionTranslation {
+	for _, t := range meta.Translations {
+		if t.Language == language {
+			return t
+		}
+	}
+	return nil
+}
+
 type CollectionCollapse string
 
 const (
