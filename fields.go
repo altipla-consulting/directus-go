@@ -168,7 +168,7 @@ func (options *FieldOptions) MarshalJSON() ([]byte, error) {
 
 type FieldChoice struct {
 	Text  string `json:"text"`
-	Value string `json:"value"`
+	Value any    `json:"value"`
 }
 
 type FieldSchema struct {
