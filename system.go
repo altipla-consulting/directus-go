@@ -18,6 +18,16 @@ type Role struct {
 	Users []string `json:"users,omitempty"`
 }
 
+type RoleV11 struct {
+	ID          string `json:"id,omitempty"`
+	Icon        Icon   `json:"icon,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Parent      string `json:"parent,omitempty"`
+
+	Users []string `json:"users,omitempty"`
+}
+
 type User struct {
 	ID        string `json:"id,omitempty"`
 	FirstName string `json:"first_name,omitempty"`
@@ -390,6 +400,54 @@ func (action *PermissionAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(*action))
 }
 
+type Policy struct {
+	ID          string `json:"id,omitempty"`
+	Icon        Icon   `json:"icon,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+
+	AdminAccess bool `json:"admin_access"`
+	AppAccess   bool `json:"app_access"`
+
+	Users []string `json:"users,omitempty"`
+	Roles []string `json:"roles,omitempty"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (policy *Policy) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, policy, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	policy.Unknown = values
+	return nil
+}
+
+func (policy *Policy) MarshalJSON() ([]byte, error) {
+	type alias Policy
+	base, err := json.Marshal((*alias)(policy))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range policy.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
+type Access struct {
+	ID     string           `json:"id"`
+	Role   Nullable[string] `json:"role"`
+	User   Nullable[string] `json:"user"`
+	Policy string           `json:"policy"`
+	Sort   int64            `json:"sort,omitempty"`
+}
+
 type Permission struct {
 	ID         int64              `json:"id,omitempty"`
 	Role       Nullable[string]   `json:"role"`
@@ -412,6 +470,42 @@ func (permission *Permission) UnmarshalJSON(data []byte) error {
 
 func (permission *Permission) MarshalJSON() ([]byte, error) {
 	type alias Permission
+	base, err := json.Marshal((*alias)(permission))
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]any)
+	for k, v := range permission.Unknown {
+		m[k] = v
+	}
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	return json.Marshal(m)
+}
+
+type PermissionV11 struct {
+	ID         int64              `json:"id,omitempty"`
+	Collection string             `json:"collection"`
+	Action     PermissionAction   `json:"action"`
+	Fields     Nullable[[]string] `json:"fields"`
+	System     bool               `json:"system,omitempty"`
+	Policy     string             `json:"policy"`
+
+	Unknown map[string]any `json:"-"`
+}
+
+func (permission *PermissionV11) UnmarshalJSON(data []byte) error {
+	values, err := marshmallow.Unmarshal(data, permission, marshmallow.WithExcludeKnownFieldsFromMap(true))
+	if err != nil {
+		return err
+	}
+	permission.Unknown = values
+	return nil
+}
+
+func (permission *PermissionV11) MarshalJSON() ([]byte, error) {
+	type alias PermissionV11
 	base, err := json.Marshal((*alias)(permission))
 	if err != nil {
 		return nil, err
