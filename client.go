@@ -27,6 +27,7 @@ type Client struct {
 	Relations          *clientRelations
 	Fields             *clientFields
 	Settings           *clientSettings
+	Server             *clientServer
 
 	instance, token string
 	logger          *slog.Logger
@@ -76,6 +77,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Fields = &clientFields{client: client}
 	client.Relations = &clientRelations{client: client}
 	client.Settings = &clientSettings{client: client}
+	client.Server = &clientServer{client: client}
 
 	return client
 }
