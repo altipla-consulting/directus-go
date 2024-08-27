@@ -3,7 +3,6 @@ package directus
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -45,28 +44,14 @@ func TestServerInfoUnmarshall(t *testing.T) {
 		}`,
 	)
 
-	var server Server
+	var server Info
 	require.NoError(t, json.Unmarshal(data, &server))
 	require.EqualValues(t, server.Version, "11.0.2")
 }
 
-func TestServerInfoMarshall(t *testing.T) {
-	server := Server{
-		Version: "11.0.2",
-	}
-
-	data, err := json.Marshal(server)
-	require.NoError(t, err)
-	require.NotEmpty(t, data)
-}
-
 func TestServerInfo(t *testing.T) {
 	cli := initClient(t)
-	s, err := cli.Server.GetInfo(context.Background())
+	s, err := cli.Server.Info(context.Background())
 	require.NoError(t, err)
 	require.NotNil(t, s)
-
-	fmt.Printf("%#v\n", s)
-	fmt.Printf("%#v\n", s.Version)
-
 }
