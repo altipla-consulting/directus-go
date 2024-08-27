@@ -16,16 +16,13 @@ type Client struct {
 	CustomTranslations *ResourceClient[CustomTranslation, string]
 	Folders            *ResourceClient[Folder, string]
 	Roles              *ResourceClient[Role, string]
-	RolesV11           *ResourceClient[Role, string]
 	Policies           *ResourceClient[Policy, string]
-	Accesses           *ResourceClient[Access, string]
 	Users              *ResourceClient[User, string]
 	Presets            *ResourceClient[Preset, int64]
 	Operations         *ResourceClient[Operation, string]
 	Flows              *ResourceClient[Flow, string]
 	Files              *ResourceClient[File, string]
 	Permissions        *ResourceClient[Permission, int64]
-	PermissionsV11     *ResourceClient[PermissionV11, int64]
 	Dashboards         *ResourceClient[Dashboard, string]
 	Panels             *ResourceClient[Panel, string]
 	Relations          *clientRelations
@@ -70,16 +67,13 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.CustomTranslations = NewResourceClient[CustomTranslation, string](client, "translations")
 	client.Folders = NewResourceClient[Folder, string](client, "folders")
 	client.Roles = NewResourceClient[Role, string](client, "roles")
-	client.RolesV11 = NewResourceClient[Role, string](client, "roles")
 	client.Policies = NewResourceClient[Policy, string](client, "policies")
-	client.Accesses = NewResourceClient[Access, string](client, "access")
 	client.Users = NewResourceClient[User, string](client, "users")
 	client.Presets = NewResourceClient[Preset, int64](client, "presets")
 	client.Operations = NewResourceClient[Operation, string](client, "operations")
 	client.Flows = NewResourceClient[Flow, string](client, "flows")
 	client.Files = NewResourceClient[File, string](client, "files")
 	client.Permissions = NewResourceClient[Permission, int64](client, "permissions")
-	client.PermissionsV11 = NewResourceClient[PermissionV11, int64](client, "permissions")
 	client.Dashboards = NewResourceClient[Dashboard, string](client, "dashboards")
 	client.Panels = NewResourceClient[Panel, string](client, "panels")
 	client.Fields = &clientFields{client: client}

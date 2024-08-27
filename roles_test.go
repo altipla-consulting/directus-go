@@ -2,7 +2,8 @@ package directus
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"log/slog"
 	"strconv"
 	"strings"
 	"testing"
@@ -11,29 +12,25 @@ import (
 )
 
 func TestRolesList(t *testing.T) {
+
 	i, err := initClient(t).Server.Info(context.Background())
 	require.NoError(t, err)
 
-	major, err := strconv.Atoi(strings.Split(i.Version, "")[0])
+	major, err := strconv.Atoi(strings.Split(i.Version, ".")[0])
 	require.NoError(t, err)
 
-	if major >= 11 {
-		roles, err := initClient(t).RolesV11.List(context.Background())
-		require.NoError(t, err)
-		require.NotEmpty(t, roles)
-
-		for _, role := range roles {
-			fmt.Printf("%#v\n", role)
-		}
-	}
-
 	if major < 11 {
-		roles, err := initClient(t).Roles.List(context.Background())
-		require.NoError(t, err)
-		require.NotEmpty(t, roles)
-
-		for _, role := range roles {
-			fmt.Printf("%#v\n", role)
-		}
+		t.Skip("Roles are only available in Directus 11 and above")
 	}
+
+	roles, err := initClient(t).Roles.List(context.Background())
+	require.NoError(t, err)
+	require.NotEmpty(t, roles)
+
+	for _, role := range roles {
+		r, err := json.Marshal(role)
+		require.NoError(t, err)
+		slog.Info("Role", slog.Any("role", r))
+	}
+
 }
