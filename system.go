@@ -15,9 +15,9 @@ type Role struct {
 	AdminAccess *bool `json:"admin_access,omitempty"`
 	AppAccess   *bool `json:"app_access,omitempty"`
 
-	Policies *[]string `json:"policies,omitempty"`
-	Parent   *string   `json:"parent,omitempty"`
-	Children *[]string `json:"children,omitempty"`
+	Policies []string `json:"policies,omitempty"`
+	Parent   *string  `json:"parent,omitempty"`
+	Children []string `json:"children,omitempty"`
 
 	Users []string `json:"users,omitempty"`
 }
