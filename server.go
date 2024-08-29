@@ -15,10 +15,10 @@ type clientServer struct {
 }
 
 type ServerInfo struct {
-	Version string `json:"version"`
-	Major  int
-	Minor  int
-	Patch  int
+	Version      string `json:"version"`
+	VersionMajor int
+	VersionMinor int
+	VersionPatch int
 
 	Unknown map[string]any `json:"-"`
 }
@@ -45,22 +45,22 @@ func (cr *clientServer) Info(ctx context.Context) (*ServerInfo, error) {
 	}
 
 	chunks := strings.Split(reply.Data.Version, ".")
-	if chunks == nil || len(chunks) < 3{
+	if chunks == nil || len(chunks) < 3 {
 		return nil, fmt.Errorf("directus: cannot parse version: %v", reply.Data.Version)
 	}
 
 	var major, minor, patch int
 	major, err = strconv.Atoi(chunks[0])
-	if err == nil{
-		reply.Data.Major = major
+	if err == nil {
+		reply.Data.VersionMajor = major
 	}
 	minor, err = strconv.Atoi(chunks[1])
-	if err == nil{
-		reply.Data.Minor = minor
+	if err == nil {
+		reply.Data.VersionMinor = minor
 	}
 	patch, err = strconv.Atoi(chunks[2])
-	if err == nil{
-		reply.Data.Patch = patch
+	if err == nil {
+		reply.Data.VersionPatch = patch
 	}
 
 	return reply.Data, nil

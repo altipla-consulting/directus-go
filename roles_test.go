@@ -16,5 +16,4 @@ func TestRolesList(t *testing.T) {
 	for _, role := range roles {
 		fmt.Printf("%#v\n", role)
 	}
-
 }

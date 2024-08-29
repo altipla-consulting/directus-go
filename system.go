@@ -6,8 +6,6 @@ import (
 	"github.com/perimeterx/marshmallow"
 )
 
-
-
 type User struct {
 	ID        string    `json:"id,omitempty"`
 	FirstName string    `json:"first_name,omitempty"`
