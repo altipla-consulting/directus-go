@@ -2,8 +2,7 @@ package directus
 
 import (
 	"context"
-	"encoding/json"
-	"log/slog"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,9 +14,7 @@ func TestRolesList(t *testing.T) {
 	require.NotEmpty(t, roles)
 
 	for _, role := range roles {
-		r, err := json.Marshal(role)
-		require.NoError(t, err)
-		slog.Info("Role", slog.Any("role", r))
+		fmt.Printf("%#v\n", role)
 	}
 
 }

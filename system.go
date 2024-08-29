@@ -6,21 +6,7 @@ import (
 	"github.com/perimeterx/marshmallow"
 )
 
-type Role struct {
-	ID          string `json:"id,omitempty"`
-	Icon        Icon   `json:"icon,omitempty"`
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
 
-	AdminAccess *bool `json:"admin_access,omitempty"`
-	AppAccess   *bool `json:"app_access,omitempty"`
-
-	Policies []string `json:"policies,omitempty"`
-	Parent   *string  `json:"parent,omitempty"`
-	Children []string `json:"children,omitempty"`
-
-	Users []string `json:"users,omitempty"`
-}
 
 type User struct {
 	ID        string    `json:"id,omitempty"`

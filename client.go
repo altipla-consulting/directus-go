@@ -15,7 +15,9 @@ type Client struct {
 	Collections        *ResourceClient[Collection, string]
 	CustomTranslations *ResourceClient[CustomTranslation, string]
 	Folders            *ResourceClient[Folder, string]
-	Roles              *ResourceClient[Role, string]
+	Roles              *clientRoles
+	rolesV10           *ResourceClient[roleV10, string]
+	rolesV11           *ResourceClient[roleV11, string]
 	Policies           *ResourceClient[Policy, string]
 	Users              *ResourceClient[User, string]
 	Presets            *ResourceClient[Preset, int64]
@@ -66,7 +68,9 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Collections = NewResourceClient[Collection, string](client, "collections")
 	client.CustomTranslations = NewResourceClient[CustomTranslation, string](client, "translations")
 	client.Folders = NewResourceClient[Folder, string](client, "folders")
-	client.Roles = NewResourceClient[Role, string](client, "roles")
+	client.Roles = &clientRoles{client: client}
+	client.rolesV10 = NewResourceClient[roleV10, string](client, "roles")
+	client.rolesV11 = NewResourceClient[roleV11, string](client, "roles")
 	client.Policies = NewResourceClient[Policy, string](client, "policies")
 	client.Users = NewResourceClient[User, string](client, "users")
 	client.Presets = NewResourceClient[Preset, int64](client, "presets")
