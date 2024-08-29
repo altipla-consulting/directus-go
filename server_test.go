@@ -3,9 +3,11 @@ package directus
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/mod/semver"
 )
 
 func TestServerInfoUnmarshall(t *testing.T) {
@@ -44,7 +46,7 @@ func TestServerInfoUnmarshall(t *testing.T) {
 		}`,
 	)
 
-	var server Info
+	var server ServerInfo
 	require.NoError(t, json.Unmarshal(data, &server))
 	require.EqualValues(t, server.Version, "11.0.2")
 }
@@ -54,4 +56,10 @@ func TestServerInfo(t *testing.T) {
 	s, err := cli.Server.Info(context.Background())
 	require.NoError(t, err)
 	require.NotNil(t, s)
+	require.True(t, s.Version != "")
+	require.True(t, s.Version[0] == 'v')
+	require.True(t, semver.IsValid(s.Version))
+	require.True(t, semver.Compare(s.Version, "v10.0.0") == 1)
+
+	fmt.Printf("Server version: %s\n", s.Version)
 }
