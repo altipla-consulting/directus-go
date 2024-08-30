@@ -44,7 +44,7 @@ func TestServerInfoUnmarshall(t *testing.T) {
 		}`,
 	)
 
-	var server Info
+	var server ServerInfo
 	require.NoError(t, json.Unmarshal(data, &server))
 	require.EqualValues(t, server.Version, "11.0.2")
 }
