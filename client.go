@@ -24,6 +24,7 @@ type Client struct {
 	Permissions        *ResourceClient[Permission, int64]
 	Dashboards         *ResourceClient[Dashboard, string]
 	Panels             *ResourceClient[Panel, string]
+	Policies           *ResourceClient[Policy, string]
 	Relations          *clientRelations
 	Fields             *clientFields
 	Settings           *clientSettings
