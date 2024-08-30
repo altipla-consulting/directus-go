@@ -1,4 +1,4 @@
-module github.com/altipla-consulting/directus-go
+module github.com/altipla-consulting/directus-go/v2
 
 go 1.21.4
 
