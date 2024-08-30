@@ -2,7 +2,7 @@ version: v1
 managed:
   enabled: true
   go_package_prefix:
-    default: github.com/altipla-consulting/directus-go/internal/testproto
+    default: github.com/altipla-consulting/directus-go/v2/internal/testproto
 plugins:
 - plugin: buf.build/protocolbuffers/go:v1.31.0
   out: internal/testproto

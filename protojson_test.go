@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "github.com/altipla-consulting/directus-go/internal/testproto"
+	pb "github.com/altipla-consulting/directus-go/v2/internal/testproto"
 )
 
 type testProtoJSONTimestamp struct {
