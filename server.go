@@ -40,6 +40,8 @@ func (cs *clientServer) Info(ctx context.Context) (*ServerInfo, error) {
 		return nil, err
 	}
 
+	reply.Data.Version = "v" + reply.Data.Version
+
 	return reply.Data, nil
 }
 
@@ -49,7 +51,7 @@ func (cs *clientServer) ValidV10(ctx context.Context) bool {
 	if err != nil {
 		return false
 	}
-	return semver.Compare(inf.Version, "10.0.0") >= 0 && semver.Compare(inf.Version, "10.13.9") <= 0
+	return semver.Compare(inf.Version, "v10.0.0") >= 0 && semver.Compare(inf.Version, "v10.13.9") <= 0
 }
 
 // Supports Directus 11.0.0 and above
@@ -59,5 +61,5 @@ func (cs *clientServer) ValidV11(ctx context.Context) bool {
 		return false
 	}
 
-	return semver.Compare(inf.Version, "11.0.0") >= 0
+	return semver.Compare(inf.Version, "v11.0.0") >= 0
 }
