@@ -9,8 +9,18 @@ Directus Go SDK.
 ## Install
 
 ```shell
-go get github.com/altipla-consulting/directus-go
+go get github.com/altipla-consulting/directus-go/v2
 ```
+
+
+## Compatibility
+
+We release a new major version for each new Directus major release. Keep using the old version of the library if you want to communicate effectively with an old server.
+
+| directus-go | Directus |
+|-------------|----------|
+| v0, v1 | Directus 10 |
+| v2 | Directus 11 |
 
 
 ## Contributing
