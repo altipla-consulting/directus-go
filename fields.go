@@ -68,6 +68,9 @@ func (meta *FieldMeta) MarshalJSON() ([]byte, error) {
 	if err := json.Unmarshal(base, &m); err != nil {
 		return nil, err
 	}
+	if meta.Options != nil && meta.Options.IsEmpty() {
+		delete(m, "options")
+	}
 	return json.Marshal(m)
 }
 
@@ -141,6 +144,10 @@ type FieldOptions struct {
 	unknown map[string]any
 }
 
+func (options *FieldOptions) IsEmpty() bool {
+	return options.Choices.IsEmpty() && len(options.unknown) == 0
+}
+
 func (options *FieldOptions) UnmarshalJSON(data []byte) error {
 	values, err := marshmallow.Unmarshal(data, options, marshmallow.WithExcludeKnownFieldsFromMap(true))
 	if err != nil {
@@ -163,15 +170,41 @@ func (options *FieldOptions) MarshalJSON() ([]byte, error) {
 	if err := json.Unmarshal(base, &m); err != nil {
 		return nil, err
 	}
+	if options.IsEmpty() {
+		return json.Marshal(nil)
+	}
 	return json.Marshal(m)
 }
 
 type FieldChoices struct {
-	Choices []*FieldChoice
-	Values  []any
+	Choices []*FieldChoice `json:"choices,omitempty"`
+	Values  []any          `json:"values,omitempty"`
+}
+
+func (choices *FieldChoices) IsEmpty() bool {
+	return len(choices.Choices) == 0 && len(choices.Values) == 0
 }
 
 func (choices *FieldChoices) UnmarshalJSON(data []byte) error {
+	// Si el JSON es un objeto vacío, inicializa los campos como vacíos
+	if string(data) == "{}" {
+		choices.Choices = []*FieldChoice{}
+		choices.Values = []any{}
+		return nil
+	}
+
+	// Si el JSON es un objeto, deserializa directamente en FieldChoices
+	type Alias FieldChoices
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(choices),
+	}
+	if err := json.Unmarshal(data, &aux); err == nil {
+		return nil
+	}
+
+	// Si el JSON es un array, deserializa en los campos correspondientes
 	var raw []json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
@@ -193,8 +226,8 @@ func (choices *FieldChoices) UnmarshalJSON(data []byte) error {
 }
 
 type FieldChoice struct {
-	Text  string `json:"text"`
-	Value any    `json:"value"`
+	Text  string `json:"text,omitempty"`
+	Value any    `json:"value,omitempty"`
 }
 
 type FieldSchema struct {
