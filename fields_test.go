@@ -1,9 +1,9 @@
 package directus
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -192,12 +192,16 @@ func TestFieldMetaOptionsChoicesNull(t *testing.T) {
 }
 
 func TestFieldMetaOptionsChoices(t *testing.T) {
-	client := NewClient("https://localhost:8055", "local-token")
-
-	all, err := client.Fields.List(context.Background())
+	//Load data from /internal/mocks/fields.json file
+	js, err := os.ReadFile("internal/mocks/fields.json")
 	require.NoError(t, err)
 
-	for _, field := range all {
+	reply := struct {
+		Data []*Field `json:"data"`
+	}{}
+	require.NoError(t, json.Unmarshal(js, &reply))
+
+	for _, field := range reply.Data {
 		if field.Meta.Options == nil {
 			fmt.Println("Field Meta Options: null")
 		} else {
