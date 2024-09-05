@@ -171,6 +171,17 @@ type FieldChoices struct {
 	Values  []any
 }
 
+func (choices *FieldChoices) MarshalJSON() ([]byte, error) {
+	switch {
+	case len(choices.Choices) > 0:
+		return json.Marshal(choices.Choices)
+	case len(choices.Values) > 0:
+		return json.Marshal(choices.Values)
+	default:
+		return []byte("null"), nil
+	}
+}
+
 func (choices *FieldChoices) UnmarshalJSON(data []byte) error {
 	var raw []json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
