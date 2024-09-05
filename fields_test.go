@@ -126,6 +126,7 @@ func TestFieldMetaOptionsChoicesString(t *testing.T) {
 	`)
 	var field Field
 	require.NoError(t, json.Unmarshal(data, &field))
+
 	require.EqualValues(t, field.Meta.ID, 1406)
 	require.Equal(t, field.Meta.Width, FieldWidthHalf)
 	require.Len(t, field.Meta.Options.Choices.Values, 2)
@@ -191,7 +192,124 @@ func TestFieldMetaOptionsChoicesNull(t *testing.T) {
 	require.Equal(t, field.Meta.Width, FieldWidthHalf)
 }
 
-func TestFieldMetaOptionsChoices(t *testing.T) {
+func TestFieldMetaOptionsUnknown(t *testing.T) {
+	data := []byte(`{
+		"collection": "directus_activity",
+		"field": "timestamp",
+		"type": "timestamp",
+		"schema": {
+			"name": "timestamp",
+			"table": "directus_activity",
+			"data_type": "timestamp",
+			"default_value": "CURRENT_TIMESTAMP",
+			"generation_expression": null,
+			"max_length": null,
+			"numeric_precision": null,
+			"numeric_scale": null,
+			"is_generated": true,
+			"is_nullable": false,
+			"is_unique": false,
+			"is_primary_key": false,
+			"has_auto_increment": false,
+			"foreign_key_column": null,
+			"foreign_key_table": null,
+			"comment": ""
+		},
+		"meta": {
+			"system": true,
+			"collection": "directus_activity",
+			"field": "timestamp",
+			"special": [
+				"date-created",
+				"cast-timestamp"
+			],
+			"interface": null,
+			"options": {
+				"relative": true
+			},
+			"display": "datetime",
+			"display_options": null,
+			"readonly": false,
+			"hidden": false,
+			"sort": 5,
+			"width": "half",
+			"group": null,
+			"translations": null,
+			"note": null,
+			"conditions": null,
+			"required": false
+		}
+	}`)
+	var field Field
+	require.NoError(t, json.Unmarshal(data, &field))
+	require.NotNil(t, field.Meta.Options.Unknown)
+}
+
+func TestFieldMetaOptionsChoicesValuesArray(t *testing.T) {
+	data := []byte(`{
+		"collection": "directus_collections",
+		"field": "accountability",
+		"type": "string",
+		"schema": {
+			"name": "accountability",
+			"table": "directus_collections",
+			"data_type": "varchar",
+			"default_value": "all",
+			"generation_expression": null,
+			"max_length": 255,
+			"numeric_precision": null,
+			"numeric_scale": null,
+			"is_generated": false,
+			"is_nullable": true,
+			"is_unique": false,
+			"is_primary_key": false,
+			"has_auto_increment": false,
+			"foreign_key_column": null,
+			"foreign_key_table": null,
+			"comment": ""
+		},
+		"meta": {
+			"system": true,
+			"collection": "directus_collections",
+			"field": "accountability",
+			"special": null,
+			"interface": "select-dropdown",
+			"options": {
+				"choices": [
+					{
+						"text": "$t:field_options.directus_collections.track_activity_revisions",
+						"value": "all"
+					},
+					{
+						"text": "$t:field_options.directus_collections.only_track_activity",
+						"value": "activity"
+					},
+					{
+						"text": "$t:field_options.directus_collections.do_not_track_anything",
+						"value": null
+					}
+				]
+			},
+			"display": null,
+			"display_options": null,
+			"readonly": false,
+			"hidden": false,
+			"sort": 22,
+			"width": "half",
+			"group": null,
+			"translations": null,
+			"note": null,
+			"conditions": null,
+			"required": false
+		}
+	}`)
+	var field Field
+	require.NoError(t, json.Unmarshal(data, &field))
+	require.NotNil(t, field.Meta.Options.Choices)
+	require.Len(t, field.Meta.Options.Choices.Choices, 3)
+}
+
+func TestFieldMetaOptionsChoicesMockedApiResponse(t *testing.T) {
 	//Load data from /internal/mocks/fields.json file
 	js, err := os.ReadFile("internal/mocks/fields.json")
 	require.NoError(t, err)
@@ -202,11 +320,11 @@ func TestFieldMetaOptionsChoices(t *testing.T) {
 	require.NoError(t, json.Unmarshal(js, &reply))
 
 	for _, field := range reply.Data {
-		if field.Meta.Options == nil {
-			fmt.Println("Field Meta Options: null")
-		} else {
-			fmt.Printf("Field Meta Options: %+v\n\n", field.Meta.Options)
-		}
+		// if field.Meta.Options == nil {
+		// 	fmt.Println("Field Meta Options: null")
+		// } else {
+		// 	fmt.Printf("Field (%s - %s) Meta Options item #%d: %+v\n\n", field.Collection, field.Field, index, field.Meta.Options)
+		// }
 
 		// Verificar la serialización y deserialización
 		data, err := json.Marshal(field)

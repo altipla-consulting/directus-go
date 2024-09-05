@@ -68,9 +68,6 @@ func (meta *FieldMeta) MarshalJSON() ([]byte, error) {
 	if err := json.Unmarshal(base, &m); err != nil {
 		return nil, err
 	}
-	if meta.Options != nil && meta.Options.IsEmpty() {
-		delete(m, "options")
-	}
 	return json.Marshal(m)
 }
 
@@ -141,19 +138,32 @@ type FieldTranslation struct {
 type FieldOptions struct {
 	Choices FieldChoices `json:"choices,omitempty"`
 
-	unknown map[string]any
-}
-
-func (options *FieldOptions) IsEmpty() bool {
-	return options.Choices.IsEmpty() && len(options.unknown) == 0
+	Unknown map[string]any `json:"-"`
 }
 
 func (options *FieldOptions) UnmarshalJSON(data []byte) error {
-	values, err := marshmallow.Unmarshal(data, options, marshmallow.WithExcludeKnownFieldsFromMap(true))
-	if err != nil {
+	if string(data) == "null" {
+		return nil
+	}
+
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
-	options.unknown = values
+
+	for key, value := range raw {
+		switch key {
+		case "choices":
+			if err := json.Unmarshal(value, &options.Choices); err != nil {
+				return err
+			}
+		default:
+			if options.Unknown == nil {
+				options.Unknown = make(map[string]any)
+			}
+			options.Unknown[key] = value
+		}
+	}
 	return nil
 }
 
@@ -164,14 +174,11 @@ func (options *FieldOptions) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	m := make(map[string]any)
-	for k, v := range options.unknown {
-		m[k] = v
-	}
 	if err := json.Unmarshal(base, &m); err != nil {
 		return nil, err
 	}
-	if options.IsEmpty() {
-		return json.Marshal(nil)
+	for k, v := range options.Unknown {
+		m[k] = v
 	}
 	return json.Marshal(m)
 }
@@ -181,53 +188,59 @@ type FieldChoices struct {
 	Values  []any          `json:"values,omitempty"`
 }
 
-func (choices *FieldChoices) IsEmpty() bool {
-	return len(choices.Choices) == 0 && len(choices.Values) == 0
-}
-
 func (choices *FieldChoices) UnmarshalJSON(data []byte) error {
-	// Si el JSON es un objeto vacío, inicializa los campos como vacíos
-	if string(data) == "{}" {
-		choices.Choices = []*FieldChoice{}
-		choices.Values = []any{}
+	if string(data) == "null" {
 		return nil
 	}
 
-	// Si el JSON es un objeto, deserializa directamente en FieldChoices
-	type Alias FieldChoices
-	aux := &struct {
-		*Alias
-	}{
-		Alias: (*Alias)(choices),
-	}
-	if err := json.Unmarshal(data, &aux); err == nil {
-		return nil
-	}
-
-	// Si el JSON es un array, deserializa en los campos correspondientes
 	var raw []json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
-	for _, rawchoice := range raw {
-		var c string
-		if err := json.Unmarshal(rawchoice, &c); err == nil {
-			choices.Values = append(choices.Values, c)
-			continue
-		}
 
+	for _, rawChoice := range raw {
 		var choice FieldChoice
-		if err := json.Unmarshal(rawchoice, &choice); err != nil {
-			return err
+		if err := json.Unmarshal(rawChoice, &choice); err != nil {
+			var strValue string
+			if err := json.Unmarshal(rawChoice, &strValue); err == nil {
+				choices.Values = append(choices.Values, strValue)
+			} else {
+				var value any
+				if err := json.Unmarshal(rawChoice, &value); err != nil {
+					return err
+				}
+				choices.Values = append(choices.Values, value)
+			}
+		} else {
+			choices.Choices = append(choices.Choices, &choice)
 		}
-		choices.Choices = append(choices.Choices, &choice)
 	}
 	return nil
 }
 
+func (choices *FieldChoices) MarshalJSON() ([]byte, error) {
+	if len(choices.Choices) > 0 {
+		return json.Marshal(choices.Choices)
+	}
+	if len(choices.Values) > 0 {
+		// Check if all values are strings
+		allStrings := true
+		for _, v := range choices.Values {
+			if _, ok := v.(string); !ok {
+				allStrings = false
+				break
+			}
+		}
+		if allStrings {
+			return json.Marshal(choices.Values)
+		}
+	}
+	return json.Marshal(choices.Values)
+}
+
 type FieldChoice struct {
-	Text  string `json:"text,omitempty"`
-	Value any    `json:"value,omitempty"`
+	Text  string `json:"text"`
+	Value any    `json:"value"`
 }
 
 type FieldSchema struct {
