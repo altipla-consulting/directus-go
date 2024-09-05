@@ -14,21 +14,21 @@ import (
 type Client struct {
 	Collections        *ResourceClient[Collection, string]
 	CustomTranslations *ResourceClient[CustomTranslation, string]
+	Dashboards         *ResourceClient[Dashboard, string]
+	Files              *ResourceClient[File, string]
+	Flows              *ResourceClient[Flow, string]
 	Folders            *ResourceClient[Folder, string]
+	Operations         *ResourceClient[Operation, string]
+	Panels             *ResourceClient[Panel, string]
+	Permissions        *ResourceClient[Permission, int64]
+	Policies           *ResourceClient[Policy, string]
+	Presets            *ResourceClient[Preset, int64]
 	Roles              *ResourceClient[Role, string]
 	Users              *ResourceClient[User, string]
-	Presets            *ResourceClient[Preset, int64]
-	Operations         *ResourceClient[Operation, string]
-	Flows              *ResourceClient[Flow, string]
-	Files              *ResourceClient[File, string]
-	Permissions        *ResourceClient[Permission, int64]
-	Dashboards         *ResourceClient[Dashboard, string]
-	Panels             *ResourceClient[Panel, string]
-	Policies           *ResourceClient[Policy, string]
-	Relations          *clientRelations
 	Fields             *clientFields
-	Settings           *clientSettings
+	Relations          *clientRelations
 	Server             *clientServer
+	Settings           *clientSettings
 
 	instance, token string
 	logger          *slog.Logger
@@ -65,20 +65,21 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 
 	client.Collections = NewResourceClient[Collection, string](client, "collections")
 	client.CustomTranslations = NewResourceClient[CustomTranslation, string](client, "translations")
+	client.Dashboards = NewResourceClient[Dashboard, string](client, "dashboards")
+	client.Files = NewResourceClient[File, string](client, "files")
+	client.Flows = NewResourceClient[Flow, string](client, "flows")
 	client.Folders = NewResourceClient[Folder, string](client, "folders")
+	client.Operations = NewResourceClient[Operation, string](client, "operations")
+	client.Panels = NewResourceClient[Panel, string](client, "panels")
+	client.Permissions = NewResourceClient[Permission, int64](client, "permissions")
+	client.Policies = NewResourceClient[Policy, string](client, "policies")
+	client.Presets = NewResourceClient[Preset, int64](client, "presets")
 	client.Roles = NewResourceClient[Role, string](client, "roles")
 	client.Users = NewResourceClient[User, string](client, "users")
-	client.Presets = NewResourceClient[Preset, int64](client, "presets")
-	client.Operations = NewResourceClient[Operation, string](client, "operations")
-	client.Flows = NewResourceClient[Flow, string](client, "flows")
-	client.Files = NewResourceClient[File, string](client, "files")
-	client.Permissions = NewResourceClient[Permission, int64](client, "permissions")
-	client.Dashboards = NewResourceClient[Dashboard, string](client, "dashboards")
-	client.Panels = NewResourceClient[Panel, string](client, "panels")
 	client.Fields = &clientFields{client: client}
 	client.Relations = &clientRelations{client: client}
-	client.Settings = &clientSettings{client: client}
 	client.Server = &clientServer{client: client}
+	client.Settings = &clientSettings{client: client}
 
 	return client
 }
