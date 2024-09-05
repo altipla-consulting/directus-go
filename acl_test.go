@@ -17,3 +17,13 @@ func TestRolesList(t *testing.T) {
 		fmt.Printf("%#v\n", role)
 	}
 }
+
+func TestPoliciesList(t *testing.T) {
+	policies, err := initClient(t).Policies.List(context.Background())
+	require.NoError(t, err)
+	require.NotEmpty(t, policies)
+
+	for _, policy := range policies {
+		fmt.Printf("%#v\n", policy)
+	}
+}
