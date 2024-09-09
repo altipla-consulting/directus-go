@@ -97,9 +97,9 @@ type Policy struct {
 	AdminAccess bool `json:"admin_access"`
 	AppAccess   bool `json:"app_access"`
 
-	Users       []string      `json:"users,omitempty"`
-	Roles       []string      `json:"roles,omitempty"`
-	Permissions []*Permission `json:"permissions,omitempty"`
+	Users       []string `json:"users,omitempty"`
+	Roles       []string `json:"roles,omitempty"`
+	Permissions []*int64 `json:"permissions,omitempty"`
 
 	Unknown map[string]any `json:"-"`
 }
