@@ -99,7 +99,7 @@ type Policy struct {
 
 	Users       []string `json:"users,omitempty"`
 	Roles       []string `json:"roles,omitempty"`
-	Permissions []*int64 `json:"permissions,omitempty"`
+	Permissions []int64  `json:"permissions,omitempty"`
 
 	Unknown map[string]any `json:"-"`
 }
