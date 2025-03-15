@@ -74,7 +74,7 @@ func NewClient(instance string, token string, opts ...ClientOption) *Client {
 	client.Permissions = NewResourceClient[Permission, int64](client, "permissions")
 	client.Policies = NewResourceClient[Policy, string](client, "policies")
 	client.Presets = NewResourceClient[Preset, int64](client, "presets")
-	client.Roles = NewResourceClient[Role, string](client, "roles")
+	client.Roles = NewResourceClient(client, "roles", WithResourceFields[Role, string]("*", "policies.id", "policies.policy"))
 	client.Users = NewResourceClient[User, string](client, "users")
 	client.Fields = &clientFields{client: client}
 	client.Relations = &clientRelations{client: client}

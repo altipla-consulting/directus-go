@@ -11,16 +11,39 @@ import (
 type ResourceClient[T any, PK string | int64] struct {
 	client   *Client
 	endpoint string
+	fields   []string
 }
 
-func NewResourceClient[T any, PK string | int64](client *Client, endpoint string) *ResourceClient[T, PK] {
-	return &ResourceClient[T, PK]{client, endpoint}
+type ResourceClientOption[T any, PK string | int64] func(rc *ResourceClient[T, PK])
+
+func WithResourceFields[T any, PK string | int64](fields ...string) ResourceClientOption[T, PK] {
+	return func(rc *ResourceClient[T, PK]) {
+		rc.fields = fields
+	}
+}
+
+func NewResourceClient[T any, PK string | int64](client *Client, endpoint string, opts ...ResourceClientOption[T, PK]) *ResourceClient[T, PK] {
+	rc := &ResourceClient[T, PK]{
+		client:   client,
+		endpoint: endpoint,
+	}
+	for _, opt := range opts {
+		opt(rc)
+	}
+	return rc
 }
 
 func (rc *ResourceClient[T, PK]) List(ctx context.Context) ([]*T, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.client.urlf("/%s", rc.endpoint), nil)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	if len(rc.fields) > 0 {
+		q := req.URL.Query()
+		for _, field := range rc.fields {
+			q.Add("fields[]", field)
+		}
+		req.URL.RawQuery = q.Encode()
 	}
 	reply := struct {
 		Data []*T `json:"data"`
@@ -35,6 +58,13 @@ func (rc *ResourceClient[T, PK]) Get(ctx context.Context, id PK) (*T, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rc.client.urlf("/%s/%v", rc.endpoint, id), nil)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	if len(rc.fields) > 0 {
+		q := req.URL.Query()
+		for _, field := range rc.fields {
+			q.Add("fields[]", field)
+		}
+		req.URL.RawQuery = q.Encode()
 	}
 	var reply T
 	if err := rc.client.sendRequest(req, &reply); err != nil {
@@ -51,6 +81,13 @@ func (rc *ResourceClient[T, PK]) Create(ctx context.Context, item *T) (*T, error
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, rc.client.urlf("/%s", rc.endpoint), &buf)
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
+	}
+	if len(rc.fields) > 0 {
+		q := req.URL.Query()
+		for _, field := range rc.fields {
+			q.Add("fields[]", field)
+		}
+		req.URL.RawQuery = q.Encode()
 	}
 	var reply T
 	if err := rc.client.sendRequest(req, &reply); err != nil {

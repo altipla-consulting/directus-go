@@ -15,7 +15,78 @@ type Role struct {
 	AdminAccess bool `json:"admin_access"`
 	AppAccess   bool `json:"app_access"`
 
-	Users []string `json:"users,omitempty"`
+	Users    []string     `json:"users,omitempty"`
+	Policies []RolePolicy `json:"policies,omitempty"`
+
+	existingPolicies map[string]string
+}
+
+type RolePolicy struct {
+	ID string `json:"id"`
+
+	accessID string
+}
+
+func (role *Role) UnmarshalJSON(data []byte) error {
+	type alias Role
+	if err := json.Unmarshal(data, (*alias)(role)); err != nil {
+		return err
+	}
+	role.existingPolicies = make(map[string]string)
+	for _, rp := range role.Policies {
+		role.existingPolicies[rp.ID] = rp.accessID
+	}
+	return nil
+}
+
+func (role *Role) MarshalJSON() ([]byte, error) {
+	type alias Role
+	base, err := json.Marshal((*alias)(role))
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]any)
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+
+	if role.existingPolicies == nil {
+		role.existingPolicies = make(map[string]string)
+	}
+
+	alt := Alterations[rolePolicyInternal, string]{}
+	present := make(map[string]bool)
+	for _, rp := range role.Policies {
+		present[rp.ID] = true
+
+		if _, ok := role.existingPolicies[rp.ID]; !ok {
+			alt.Create = append(alt.Create, &rolePolicyInternal{Policy: rp.ID})
+		}
+	}
+	for policy, accessID := range role.existingPolicies {
+		if !present[policy] {
+			alt.Delete = append(alt.Delete, accessID)
+		}
+	}
+	m["policies"] = alt
+
+	return json.Marshal(m)
+}
+
+type rolePolicyInternal struct {
+	ID     string `json:"id,omitempty"`
+	Policy string `json:"policy"`
+}
+
+func (rp *RolePolicy) UnmarshalJSON(data []byte) error {
+	var read rolePolicyInternal
+	if err := json.Unmarshal(data, &read); err != nil {
+		return err
+	}
+	rp.ID = read.Policy
+	rp.accessID = read.ID
+	return nil
 }
 
 type User struct {

@@ -18,6 +18,20 @@ func TestRolesList(t *testing.T) {
 	}
 }
 
+func TestRolesCreate(t *testing.T) {
+	create := &Role{
+		Name: "Test",
+		Policies: []RolePolicy{
+			{ID: "365820c9-c20d-48cf-929e-58638b547a34"},
+		},
+	}
+	role, err := initClient(t).Roles.Create(context.Background(), create)
+	require.NoError(t, err)
+	require.NotNil(t, role)
+
+	fmt.Printf("%#v\n", role)
+}
+
 func TestPoliciesList(t *testing.T) {
 	policies, err := initClient(t).Policies.List(context.Background())
 	require.NoError(t, err)
