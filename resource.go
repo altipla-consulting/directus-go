@@ -89,11 +89,13 @@ func (rc *ResourceClient[T, PK]) Create(ctx context.Context, item *T) (*T, error
 		}
 		req.URL.RawQuery = q.Encode()
 	}
-	var reply T
+	reply := struct {
+		Data *T `json:"data"`
+	}{}
 	if err := rc.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
 
 func (rc *ResourceClient[T, PK]) Delete(ctx context.Context, id PK) error {
@@ -113,9 +115,18 @@ func (rc *ResourceClient[T, PK]) Patch(ctx context.Context, id PK, item *T) (*T,
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply T
+	if len(rc.fields) > 0 {
+		q := req.URL.Query()
+		for _, field := range rc.fields {
+			q.Add("fields[]", field)
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+	reply := struct {
+		Data *T `json:"data"`
+	}{}
 	if err := rc.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
