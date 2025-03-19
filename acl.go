@@ -19,6 +19,7 @@ type Role struct {
 	Policies []RolePolicy `json:"policies,omitempty"`
 
 	existingPolicies map[string]string
+	alt              *Alterations[rolePolicyInternal, string]
 }
 
 type RolePolicy struct {
@@ -39,18 +40,7 @@ func (role *Role) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (role *Role) MarshalJSON() ([]byte, error) {
-	type alias Role
-	base, err := json.Marshal((*alias)(role))
-	if err != nil {
-		return nil, err
-	}
-
-	m := make(map[string]any)
-	if err := json.Unmarshal(base, &m); err != nil {
-		return nil, err
-	}
-
+func (role *Role) BeforeDirectus() {
 	if role.existingPolicies == nil {
 		role.existingPolicies = make(map[string]string)
 	}
@@ -69,8 +59,25 @@ func (role *Role) MarshalJSON() ([]byte, error) {
 			alt.Delete = append(alt.Delete, accessID)
 		}
 	}
-	m["policies"] = alt
+	role.alt = &alt
+}
 
+func (role *Role) MarshalJSON() ([]byte, error) {
+	type alias Role
+	base, err := json.Marshal((*alias)(role))
+	if err != nil {
+		return nil, err
+	}
+
+	if role.alt == nil {
+		return base, nil
+	}
+
+	m := make(map[string]any)
+	if err := json.Unmarshal(base, &m); err != nil {
+		return nil, err
+	}
+	m["policies"] = role.alt
 	return json.Marshal(m)
 }
 
