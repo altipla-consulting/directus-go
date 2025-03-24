@@ -35,7 +35,9 @@ func (role *Role) UnmarshalJSON(data []byte) error {
 	}
 	role.existingPolicies = make(map[string]string)
 	for _, rp := range role.Policies {
-		role.existingPolicies[rp.ID] = rp.accessID
+		if rp.accessID != "" {
+			role.existingPolicies[rp.ID] = rp.accessID
+		}
 	}
 	return nil
 }
@@ -82,7 +84,7 @@ func (role *Role) MarshalJSON() ([]byte, error) {
 }
 
 type rolePolicyInternal struct {
-	ID     string `json:"id,omitempty"`
+	ID     string `json:"id"`
 	Policy string `json:"policy"`
 }
 
@@ -91,6 +93,14 @@ func (rp *RolePolicy) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &read); err != nil {
 		return err
 	}
+
+	// Reading from the normal JSON representation that this package sends.
+	if read.Policy == "" {
+		rp.ID = read.ID
+		return nil
+	}
+
+	// Reading from the Directus API.
 	rp.ID = read.Policy
 	rp.accessID = read.ID
 	return nil
