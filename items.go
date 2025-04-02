@@ -84,6 +84,17 @@ func WithDeepLimit(field string, limit int64) ReadOption {
 	}
 }
 
+// WithDeepFilter you can fetch relations for only the matching items.
+// https://docs.directus.io/guides/headless-cms/content-translations.html#fetching-translated-content-with-the-api
+func WithDeepFilter(relation string, filterField string, filterValue string) ReadOption {
+	return func(req *http.Request) {
+		q := req.URL.Query()
+		deepFilterKey := fmt.Sprintf("deep[%s][_filter][%s][_eq]", relation, filterField)
+		q.Set(deepFilterKey, filterValue)
+		req.URL.RawQuery = q.Encode()
+	}
+}
+
 // NewItemsClient creates a new client to access & write items in a type-safe way.
 func NewItemsClient[T any](client *Client, collection string, opts ...ReadOption) *ItemsClient[T] {
 	return &ItemsClient[T]{
