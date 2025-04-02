@@ -26,6 +26,10 @@ func (f filterOperator) content() any {
 	}
 }
 
+func (f filterOperator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.content())
+}
+
 func (f filterOperator) String() string {
 	return fmt.Sprintf("%s %s %v", f.field, f.op, f.value)
 }
@@ -105,6 +109,10 @@ func (f filterLogical) String() string {
 	return strings.Join(vals, " "+f.op+" ")
 }
 
+func (f filterLogical) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.content())
+}
+
 func And(filters ...Filter) Filter {
 	return filterLogical{op: "_and", values: filters}
 }
@@ -128,6 +136,10 @@ func (f filterRelated) String() string {
 	return fmt.Sprintf("%s.%s", f.field, f.filter.String())
 }
 
+func (f filterRelated) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.content())
+}
+
 func Related(field string, filter Filter) Filter {
 	return filterRelated{field, filter}
 }
@@ -140,6 +152,10 @@ func (f filterEmpty) String() string {
 
 func (f filterEmpty) content() any {
 	return map[string]any{}
+}
+
+func (f filterEmpty) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.content())
 }
 
 func Noop() Filter {

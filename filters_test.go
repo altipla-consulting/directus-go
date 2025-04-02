@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFiltersMutltipleAnd(t *testing.T) {
+func TestFiltersMultipleAnd(t *testing.T) {
 	json, err := FilterJSON(And(Eq("domain", "foo-domain"), Eq("auth_token", "foo-auth-token"), Eq("status", "PUBLISHED")))
 	require.NoError(t, err)
 	require.JSONEq(t, string(json), `{

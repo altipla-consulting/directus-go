@@ -3,6 +3,9 @@ package directus
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -159,4 +162,61 @@ func TestItemsFilter(t *testing.T) {
 	for _, room := range rooms {
 		fmt.Printf("%#v\n", room)
 	}
+}
+
+type Foo struct {
+	ID           string `json:"id"`
+	Translations []FooTranslation
+}
+
+type FooTranslation struct {
+	LanguagesCode string `json:"languages_code"`
+	DisplayName   string `json:"display_name"`
+}
+
+func TestItemsDeepFilter(t *testing.T) {
+	var u string
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u = r.URL.String()
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, `{"data": [{"id": "1", "translations": [{"languages_code": "en-GB", "display_name": "Test"}]}]}`)
+	}))
+	defer s.Close()
+	client := NewClient(s.URL, "local-token", WithBodyLogger())
+	items := NewItemsClient[Foo](client, "foo")
+
+	results, err := items.List(context.Background(), WithDeepFilter("translations", Eq("languages_code", "en-GB")))
+	require.NoError(t, err)
+
+	require.Len(t, results, 1)
+	require.Equal(t, "1", results[0].ID)
+	require.Len(t, results[0].Translations, 1)
+	require.Equal(t, "en-GB", results[0].Translations[0].LanguagesCode)
+	require.Equal(t, "Test", results[0].Translations[0].DisplayName)
+
+	got, err := url.QueryUnescape(u)
+	require.NoError(t, err)
+	require.Equal(t, `/items/foo?deep={"translations":{"_filter":{"languages_code":{"_eq":"en-GB"}}}}&limit=-1`, got)
+}
+
+func TestItemsMultipleDeepFilter(t *testing.T) {
+	var u string
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u = r.URL.String()
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, `{"data": []}`)
+	}))
+	defer s.Close()
+	client := NewClient(s.URL, "local-token", WithBodyLogger())
+	items := NewItemsClient[Foo](client, "foo")
+
+	results, err := items.List(context.Background(),
+		WithDeepFilter("translations", Eq("languages_code", "en-GB")),
+		WithDeepFilter("another_field", Eq("display_name", "foo")))
+	require.NoError(t, err)
+	require.Empty(t, results)
+
+	got, err := url.QueryUnescape(u)
+	require.NoError(t, err)
+	require.Equal(t, `/items/foo?deep={"another_field":{"_filter":{"display_name":{"_eq":"foo"}}},"translations":{"_filter":{"languages_code":{"_eq":"en-GB"}}}}&limit=-1`, got)
 }

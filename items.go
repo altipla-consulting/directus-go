@@ -18,69 +18,86 @@ type ItemsClient[T any] struct {
 	opts       []ReadOption
 }
 
+type readOptionApply struct {
+	req  *http.Request
+	deep map[string]deepFilter
+}
+
+type deepFilter struct {
+	Filter Filter `json:"_filter"`
+}
+
 // ReadOption configures the returned data from Directus when reading or returning items.
-type ReadOption func(req *http.Request)
+type ReadOption func(apply *readOptionApply)
 
 // WithFields filters the fields of each returned item. It can add relations deep fields to the response to obtain them
 // in the same request.
 func WithFields(fields ...string) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		for _, field := range fields {
 			q.Add("fields[]", field)
 		}
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
 	}
 }
 
 // WithSort sorts the returned items by the given fields. Use a minus sign (-) to sort in descending order.
 // It does not order deep relations inside each of the items. To sort deep relations, use WithDeepSort.
 func WithSort(sort ...string) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		for _, s := range sort {
 			q.Add("sort[]", s)
 		}
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
 	}
 }
 
 // WithLimit limits the number of returned items.
 func WithLimit(limit int64) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		q.Set("limit", fmt.Sprintf("%d", limit))
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
 	}
 }
 
 // WithOffset skips the first n items.
 func WithOffset(offset int64) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		q.Add("offset", fmt.Sprintf("%d", offset))
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
 	}
 }
 
 // WithDeepSort sorts the deep relations of each returned item by the given fields. Use a minus sign (-) to sort in
 // descending order. It does not order the items themselves. To sort the items, use WithSort.
 func WithDeepSort(field string, sort ...string) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		for _, s := range sort {
 			q.Add(fmt.Sprintf("deep[%s][_sort][]", field), s)
 		}
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
 	}
 }
 
 // WithDeepLimit limits the number of returned deep relations of each item.
 func WithDeepLimit(field string, limit int64) ReadOption {
-	return func(req *http.Request) {
-		q := req.URL.Query()
+	return func(apply *readOptionApply) {
+		q := apply.req.URL.Query()
 		q.Add(fmt.Sprintf("deep[%s][_limit]", field), fmt.Sprintf("%d", limit))
-		req.URL.RawQuery = q.Encode()
+		apply.req.URL.RawQuery = q.Encode()
+	}
+}
+
+// WithDeepFilter adds a filter to the deep relations returned from the query. It is applied together with WithFields()
+// most of the time to extract the related items.
+func WithDeepFilter(field string, filter Filter) ReadOption {
+	return func(apply *readOptionApply) {
+		apply.deep[field] = deepFilter{Filter: filter}
 	}
 }
 
@@ -93,9 +110,33 @@ func NewItemsClient[T any](client *Client, collection string, opts ...ReadOption
 	}
 }
 
-type doOption func(req *http.Request)
+func (items *ItemsClient[T]) applyOpts(req *http.Request, opts ...ReadOption) error {
+	apply := &readOptionApply{
+		req:  req,
+		deep: make(map[string]deepFilter),
+	}
 
-func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, request, reply any, opts ...doOption) error {
+	for _, opt := range items.opts {
+		opt(apply)
+	}
+	for _, opt := range opts {
+		opt(apply)
+	}
+
+	q := apply.req.URL.Query()
+	if len(apply.deep) > 0 {
+		b, err := json.Marshal(apply.deep)
+		if err != nil {
+			return fmt.Errorf("directus: cannot marshal deep filter: %v", err)
+		}
+		q.Set("deep", string(b))
+	}
+	req.URL.RawQuery = q.Encode()
+
+	return nil
+}
+
+func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, request, reply any, opts ...ReadOption) error {
 	var body io.Reader
 	if request != nil {
 		var buf bytes.Buffer
@@ -108,11 +149,8 @@ func (items *ItemsClient[T]) itemsdo(ctx context.Context, method, url string, re
 	if err != nil {
 		return fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	for _, opt := range items.opts {
-		opt(req)
-	}
-	for _, opt := range opts {
-		opt(req)
+	if err := items.applyOpts(req, opts...); err != nil {
+		return err
 	}
 	return items.c.sendRequest(req, &reply)
 }
@@ -123,15 +161,14 @@ func (items *ItemsClient[T]) List(ctx context.Context, opts ...ReadOption) ([]*T
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
+
 	// Return all items of the collection by default.
 	q := req.URL.Query()
 	q.Set("limit", "-1")
 	req.URL.RawQuery = q.Encode()
-	for _, opt := range items.opts {
-		opt(req)
-	}
-	for _, opt := range opts {
-		opt(req)
+
+	if err := items.applyOpts(req, opts...); err != nil {
+		return nil, err
 	}
 
 	reply := struct {
@@ -161,11 +198,9 @@ func (items *ItemsClient[T]) Filter(ctx context.Context, filter Filter, opts ...
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	for _, opt := range items.opts {
-		opt(req)
-	}
-	for _, opt := range opts {
-		opt(req)
+
+	if err := items.applyOpts(req, opts...); err != nil {
+		return nil, err
 	}
 
 	reply := struct {
@@ -187,11 +222,9 @@ func (items *ItemsClient[T]) Get(ctx context.Context, id string, opts ...ReadOpt
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	for _, opt := range items.opts {
-		opt(req)
-	}
-	for _, opt := range opts {
-		opt(req)
+
+	if err := items.applyOpts(req, opts...); err != nil {
+		return nil, err
 	}
 
 	reply := struct {
