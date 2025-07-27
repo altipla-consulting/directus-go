@@ -9,7 +9,7 @@ import (
 
 func TestFieldMetaUnmarshal(t *testing.T) {
 	data := []byte(`
-		{
+		{ "data" : {
 			"collection": "contact_data",
 			"field": "phone",
 			"type": "string",
@@ -60,17 +60,20 @@ func TestFieldMetaUnmarshal(t *testing.T) {
 				"validation": null,
 				"validation_message": null
 			}
-		}
+	}}
 	`)
-	var field Field
-	require.NoError(t, json.Unmarshal(data, &field))
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
+	require.NoError(t, json.Unmarshal(data, &reply))
+	field := reply.Data
 	require.EqualValues(t, field.Meta.ID, 1406)
 	require.Equal(t, field.Meta.Width, FieldWidthHalf)
 }
 
 func TestFieldMetaOptionsChoicesString(t *testing.T) {
 	data := []byte(`
-		{
+		{ "data":{
 			"collection": "contact_data",
 			"field": "phone",
 			"type": "string",
@@ -120,10 +123,13 @@ func TestFieldMetaOptionsChoicesString(t *testing.T) {
 				"validation": null,
 				"validation_message": null
 			}
-		}
+		}}
 	`)
-	var field Field
-	require.NoError(t, json.Unmarshal(data, &field))
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
+	require.NoError(t, json.Unmarshal(data, &reply))
+	field := reply.Data
 	require.EqualValues(t, field.Meta.ID, 1406)
 	require.Equal(t, field.Meta.Width, FieldWidthHalf)
 	require.Len(t, field.Meta.Options.Choices.Values, 2)
@@ -133,7 +139,7 @@ func TestFieldMetaOptionsChoicesString(t *testing.T) {
 
 func TestFieldMarshalCycle(t *testing.T) {
 	data := []byte(`
-		{
+		{ "data" : {
 			"collection": "contact_data",
 			"field": "phone",
 			"type": "string",
@@ -183,11 +189,13 @@ func TestFieldMarshalCycle(t *testing.T) {
 				"validation": null,
 				"validation_message": null
 			}
-		}
+		}}
 	`)
-	var field Field
-	require.NoError(t, json.Unmarshal(data, &field))
-
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
+	require.NoError(t, json.Unmarshal(data, &reply))
+	field := reply.Data
 	write, err := json.Marshal(field)
 	require.NoError(t, err)
 

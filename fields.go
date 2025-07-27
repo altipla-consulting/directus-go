@@ -284,11 +284,13 @@ func (cr *clientFields) Get(ctx context.Context, collection, field string) (*Fie
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply Field
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
 	if err := cr.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
 
 func (cr *clientFields) Create(ctx context.Context, field *Field) (*Field, error) {
