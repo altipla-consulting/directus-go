@@ -25,6 +25,7 @@ const (
 	FieldTypeAlias     FieldType = "alias"
 	FieldTypeDate      FieldType = "date"
 	FieldTypeTimestamp FieldType = "timestamp"
+	FieldTypeUUID      FieldType = "uuid"
 )
 
 type FieldMeta struct {
@@ -306,11 +307,13 @@ func (cr *clientFields) Create(ctx context.Context, field *Field) (*Field, error
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply Field
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
 	if err := cr.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
 
 func (cr *clientFields) Delete(ctx context.Context, collection, field string) error {
@@ -337,9 +340,11 @@ func (cr *clientFields) Patch(ctx context.Context, f *Field) (*Field, error) {
 	if err != nil {
 		return nil, fmt.Errorf("directus: cannot prepare request: %v", err)
 	}
-	var reply Field
+	var reply = struct {
+		Data *Field `json:"data"`
+	}{}
 	if err := cr.client.sendRequest(req, &reply); err != nil {
 		return nil, err
 	}
-	return &reply, nil
+	return reply.Data, nil
 }
